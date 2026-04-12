@@ -62,6 +62,34 @@ app.post('/test-login', async (req, res) => {
   }
 });
 
+// Diagnostic endpoint - check users table schema and count
+app.get('/db-info', async (req, res) => {
+  try {
+    // Check table exists and columns
+    const schemaResult = await pool.query(`
+      SELECT column_name, data_type, is_nullable 
+      FROM information_schema.columns 
+      WHERE table_name = 'users'
+      ORDER BY ordinal_position
+    `);
+    
+    // Count users
+    const countResult = await pool.query('SELECT COUNT(*) as total FROM users');
+    
+    // Get first user (if exists)
+    const firstUserResult = await pool.query('SELECT id, username, email, role FROM users LIMIT 1');
+    
+    res.json({
+      schema: schemaResult.rows,
+      totalUsers: countResult.rows[0],
+      sampleUser: firstUserResult.rows[0] || null,
+      message: 'Database diagnostic info'
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message, stack: error.stack });
+  }
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
