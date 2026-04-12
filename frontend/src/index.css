@@ -169,6 +169,8 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
 .btn-secondary:hover { background: var(--border); }
 .btn-danger { background: #fee2e2; color: var(--danger); padding: 0.65rem 1.25rem; }
 .btn-danger:hover { background: #fecaca; }
+.btn-warning { background: #fef3c7; color: #92400e; padding: 0.65rem 1.25rem; }
+.btn-warning:hover { background: #fde68a; }
 .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
 .btn-group { display: flex; gap: 0.5rem; }
 .mt-1 { margin-top: 0.75rem; }
@@ -404,10 +406,9 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
   .footer-inner { flex-direction: column; align-items: flex-start; }
   .footer-contact { flex-direction: column; gap: 0.4rem; }
 
-  /* Users table */
-  .content { padding: 0; }
-  .users-table { font-size: 0.8rem; display: block; overflow-x: auto; }
-  .users-table th, .users-table td { padding: 0.6rem 0.4rem; white-space: nowrap; }
+  /* Users table → cards on mobile */
+  .users-table-wrapper { display: none; }
+  .users-card-list { display: flex; }
 
   /* Modal */
   .modal { width: 95%; padding: 1.5rem; }
@@ -460,18 +461,22 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
 .content h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; }
 .content > .btn { margin-bottom: 1.5rem; }
 
-.users-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.users-table-wrapper { overflow-x: auto; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1rem; }
+.users-table { width: 100%; border-collapse: collapse; background: var(--card-bg); min-width: 560px; }
 .users-table thead { background: var(--bg); }
-.users-table th { padding: 1rem; text-align: left; font-weight: 600; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; border: none; }
-.users-table td { padding: 1rem; border-bottom: 1px solid var(--border); }
+.users-table th { padding: 0.85rem 1rem; text-align: left; font-weight: 600; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+.users-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); }
 .users-table tbody tr:last-child td { border-bottom: none; }
-.users-table tbody tr:hover { background: #fafbfc; }
+.users-table tbody tr:hover td { background: #fafbfc; }
+.user-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
-.users-table .btn-sm { margin-right: 0.5rem; }
-.users-table .btn-info { background: #e0f2fe; color: #0369a1; }
-.users-table .btn-info:hover { background: #bae6fd; }
-.users-table .btn-warning { background: #fef3c7; color: #92400e; }
-.users-table .btn-warning:hover { background: #fecb5e; }
+/* User cards — mobile only */
+.users-card-list { display: none; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+.user-card { background: var(--card-bg); border-radius: 12px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--border); }
+.user-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; }
+.user-card-email { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.2rem; word-break: break-all; }
+.user-card-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+.user-card-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
 /* Modal */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 300; }
