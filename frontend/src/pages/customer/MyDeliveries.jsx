@@ -68,6 +68,8 @@ const MyDeliveries = () => {
   const [streetAddress, setStreetAddress] = useState('');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 2;
 
   const districtInfo = district ? RWANDA_DISTRICTS[district] : null;
   const fee = districtInfo ? calcFee(districtInfo.km) : 0;
@@ -203,7 +205,7 @@ const MyDeliveries = () => {
         <div className="card"><p className="no-results">No deliveries yet. Request one above!</p></div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {deliveries.map(d => (
+          {deliveries.slice((page - 1) * PER_PAGE, page * PER_PAGE).map(d => (
             <div key={d.id} className="card" style={{ borderLeft: `4px solid ${statusColor[d.status] || '#94a3b8'}` }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
                 <strong>Delivery #{d.id}</strong>
@@ -234,6 +236,16 @@ const MyDeliveries = () => {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {deliveries.length > PER_PAGE && (
+        <div className="pagination" style={{ marginTop: '1rem' }}>
+          <button className="page-btn" onClick={() => setPage(p => p - 1)} disabled={page === 1}>← Prev</button>
+          {Array.from({ length: Math.ceil(deliveries.length / PER_PAGE) }, (_, i) => (
+            <button key={i} className={`page-btn ${page === i + 1 ? 'page-btn-active' : ''}`} onClick={() => setPage(i + 1)}>{i + 1}</button>
+          ))}
+          <button className="page-btn" onClick={() => setPage(p => p + 1)} disabled={page >= Math.ceil(deliveries.length / PER_PAGE)}>Next →</button>
         </div>
       )}
     </div>
