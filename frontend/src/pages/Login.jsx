@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../api/axios';
 import toast from 'react-hot-toast';
 
 const Login = () => {
@@ -22,21 +21,9 @@ const Login = () => {
     } catch (err) {
       const errMsg = err.response?.data?.error || err.message || 'Invalid credentials';
       setError(errMsg);
-      console.error('Login error:', errMsg, err);
       toast.error(errMsg);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const testBackendConnection = async () => {
-    try {
-      const backendUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || '';
-      await api.get(backendUrl ? `${backendUrl}/health` : '/health');
-      toast.success('✅ Backend connected');
-    } catch (err) {
-      toast.error('❌ Backend connection failed');
-      console.error('Backend test error:', err);
     }
   };
 
@@ -74,9 +61,6 @@ const Login = () => {
               {loading ? <span className="auth-btn-loading">Signing in...</span> : 'Sign In →'}
             </button>
             {error && <div style={{ color: '#ef4444', fontSize: '0.9rem', marginTop: '0.5rem' }}>⚠️ {error}</div>}
-            <button type="button" className="auth-submit-btn" style={{ marginTop: '0.5rem', background: '#6366f1', fontSize: '0.85rem' }} onClick={testBackendConnection}>
-              🔧 Test Backend
-            </button>
           </form>
           <div className="auth-links">
             <Link to="/register">Don't have an account? <strong>Register</strong></Link>
