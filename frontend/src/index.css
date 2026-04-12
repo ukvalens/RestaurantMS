@@ -412,10 +412,6 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
   .footer-inner { flex-direction: column; align-items: flex-start; }
   .footer-contact { flex-direction: column; gap: 0.4rem; }
 
-  /* Delivery table → cards on mobile */
-  .delivery-card-list { display: flex; }
-  .delivery-table-wrapper { display: none; }
-
   /* Modal */
   .modal { width: 95%; padding: 1.5rem; }
   .form-buttons { flex-direction: column; }
@@ -462,23 +458,40 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
   .data-table th, .data-table td { padding: 0.6rem 0.75rem; }
 }
 
-/* ===== DELIVERY ===== */
-.delivery-card-list { display: none; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
-.delivery-table-wrapper { overflow-x: auto; }
-.delivery-card { background: var(--card-bg); border-radius: 12px; padding: 1rem; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
-.delivery-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-.delivery-card-address { font-size: 0.88rem; color: var(--text); margin-bottom: 0.4rem; }
-.delivery-card-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.6rem; }
-.delivery-card-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.6rem; }
+/* ===== DELIVERY — MOBILE FIRST ===== */
 
-/* Delivery progress tracker */
-.delivery-progress { display: flex; align-items: flex-start; gap: 0; margin-top: 1rem; overflow-x: auto; padding-bottom: 0.25rem; }
-.delivery-step { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 70px; position: relative; }
+/* Cards — shown by default (mobile-first) */
+.dv-cards { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+.dv-card { background: var(--card-bg); border-radius: 12px; padding: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid var(--border); }
+.dv-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.dv-card-id { font-weight: 700; font-size: 0.9rem; color: var(--text-muted); }
+.dv-card-address { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.5rem; }
+.dv-card-meta { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+.dv-card-notes { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+.dv-card-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+
+/* Table — hidden by default, shown on large screens */
+.dv-table-wrapper { display: none; }
+
+/* Tablet: 2-column card grid */
+@media (min-width: 600px) {
+  .dv-cards { display: grid; grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Desktop: hide cards, show table */
+@media (min-width: 960px) {
+  .dv-cards { display: none; }
+  .dv-table-wrapper { display: block; overflow-x: auto; }
+}
+
+/* Delivery progress tracker (customer page) */
+.delivery-progress { display: flex; align-items: flex-start; margin-top: 1rem; overflow-x: auto; padding-bottom: 0.25rem; }
+.delivery-step { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 60px; position: relative; }
 .delivery-step:not(:last-child)::after { content: ''; position: absolute; top: 7px; left: 50%; width: 100%; height: 2px; background: var(--border); z-index: 0; }
 .delivery-step.active:not(:last-child)::after { background: var(--primary); }
 .delivery-step-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--border); border: 2px solid var(--border); z-index: 1; margin-bottom: 0.3rem; flex-shrink: 0; }
 .delivery-step.active .delivery-step-dot { background: var(--primary); border-color: var(--primary); }
-.delivery-step span { font-size: 0.68rem; color: var(--text-muted); text-align: center; text-transform: capitalize; }
+.delivery-step span { font-size: 0.65rem; color: var(--text-muted); text-align: center; text-transform: capitalize; }
 .delivery-step.active span { color: var(--primary); font-weight: 600; }
 
 /* ===== USER MANAGEMENT — MOBILE FIRST ===== */
