@@ -27,7 +27,7 @@ import CustomerDashboard from './pages/customer/CustomerDashboard';
 import MyOrders from './pages/customer/MyOrders';
 import Announcements from './pages/Announcements';
 
-const STAFF = ['admin', 'manager', 'waiter', 'chef'];
+const STAFF = ['admin', 'manager', 'waiter'];
 
 function App() {
   return (
