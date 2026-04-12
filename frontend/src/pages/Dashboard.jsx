@@ -58,7 +58,7 @@ const Dashboard = () => {
                 <td>#{o.id}</td>
                 <td>Table {o.table_number}</td>
                 <td>{o.waiter_name}</td>
-                <td>${parseFloat(o.total_amount).toFixed(2)}</td>
+                <td>RWF {parseFloat(o.total_amount).toFixed(0)}</td>
                 <td><span className={`badge badge-${o.status}`}>{o.status}</span></td>
               </tr>
             ))}

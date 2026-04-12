@@ -186,7 +186,7 @@ const Menu = () => {
                 <h3>{item.name}</h3>
                 <p>{item.description}</p>
                 <div className="menu-footer">
-                  <strong>${parseFloat(item.price).toFixed(2)}</strong>
+                  <strong>RWF {parseFloat(item.price).toFixed(0)}</strong>
                   <span className={`badge badge-${item.is_available ? 'available' : 'occupied'}`}>
                     {item.is_available ? 'Available' : 'Unavailable'}
                   </span>

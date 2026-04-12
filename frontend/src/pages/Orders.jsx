@@ -104,7 +104,7 @@ const Orders = () => {
               <div key={i} className="order-item-row">
                 <select value={item.menu_item_id} onChange={e => updateItem(i, 'menu_item_id', e.target.value)} required>
                   <option value="">Select Item</option>
-                  {menuItems.map(m => <option key={m.id} value={m.id}>{m.name} - ${m.price}</option>)}
+                  {menuItems.map(m => <option key={m.id} value={m.id}>{m.name} - RWF {m.price}</option>)}
                 </select>
                 <input type="number" min="1" placeholder="Qty" value={item.quantity} onChange={e => updateItem(i, 'quantity', e.target.value)} required />
                 <input placeholder="Special instructions" value={item.special_instructions} onChange={e => updateItem(i, 'special_instructions', e.target.value)} />
@@ -142,7 +142,7 @@ const Orders = () => {
                 <td>#{o.id}</td>
                 <td>Table {o.table_number}</td>
                 <td>{o.waiter_name}</td>
-                <td>${parseFloat(o.total_amount).toFixed(2)}</td>
+                <td>RWF {parseFloat(o.total_amount).toFixed(0)}</td>
                 <td><span className={`badge badge-${o.status}`}>{o.status}</span></td>
                 <td>
                   <select value={o.status} onChange={e => updateStatus(o.id, e.target.value)} className="status-select">

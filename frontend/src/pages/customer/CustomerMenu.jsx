@@ -112,7 +112,7 @@ const CustomerMenu = () => {
                 <h3>{item.name}</h3>
                 <p>{item.description}</p>
                 <div className="menu-footer">
-                  <strong>${parseFloat(item.price).toFixed(2)}</strong>
+                  <strong>RWF {parseFloat(item.price).toFixed(0)}</strong>
                   {inCart
                     ? <span className="badge badge-confirmed">In cart ×{inCart.qty}</span>
                     : <span className="badge badge-available">Available</span>}
@@ -167,7 +167,7 @@ const CustomerMenu = () => {
                     <button className="btn-secondary btn-sm" onClick={() => updateQty(c.id, c.qty - 1)}>−</button>
                     <span style={{ minWidth: 24, textAlign: 'center' }}>{c.qty}</span>
                     <button className="btn-secondary btn-sm" onClick={() => updateQty(c.id, c.qty + 1)}>+</button>
-                    <span style={{ marginLeft: 'auto', fontWeight: 600 }}>${(parseFloat(c.price) * c.qty).toFixed(2)}</span>
+                    <span style={{ marginLeft: 'auto', fontWeight: 600 }}>RWF {(parseFloat(c.price) * c.qty).toFixed(0)}</span>
                   </div>
                   <input placeholder="Special instructions (optional)" value={c.special_instructions}
                     onChange={e => updateNote(c.id, e.target.value)}
@@ -180,7 +180,7 @@ const CustomerMenu = () => {
               <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1rem' }}>
                   <span>Total</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>RWF {cartTotal.toFixed(0)}</span>
                 </div>
                 <div className="form-field">
                   <label className="form-label">Select Table</label>

@@ -68,7 +68,7 @@ const Payments = () => {
         <div className="stat-icon">💰</div>
         <div>
           <p className="stat-label">Total Revenue {(filterMethod || filterStatus || search) ? '(filtered)' : ''}</p>
-          <h3 className="stat-value">${totalRevenue.toFixed(2)}</h3>
+          <h3 className="stat-value">RWF {totalRevenue.toFixed(0)}</h3>
         </div>
       </div>
 
@@ -78,7 +78,7 @@ const Payments = () => {
           <form onSubmit={handleCreate} className="form-grid">
             <select value={form.order_id} onChange={e => handleOrderSelect(e.target.value)} required>
               <option value="">Select Order</option>
-              {orders.map(o => <option key={o.id} value={o.id}>Order #{o.id} - Table {o.table_number} (${parseFloat(o.total_amount).toFixed(2)})</option>)}
+              {orders.map(o => <option key={o.id} value={o.id}>Order #{o.id} - Table {o.table_number} (RWF {parseFloat(o.total_amount).toFixed(0)})</option>)}
             </select>
             <input type="number" step="0.01" placeholder="Amount" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} required />
             <select value={form.payment_method} onChange={e => setForm({ ...form, payment_method: e.target.value })}>
@@ -122,7 +122,7 @@ const Payments = () => {
               <tr key={p.id}>
                 <td>#{p.id}</td>
                 <td>Order #{p.order_id}</td>
-                <td>${parseFloat(p.amount).toFixed(2)}</td>
+                <td>RWF {parseFloat(p.amount).toFixed(0)}</td>
                 <td><span className="badge badge-reserved">{p.payment_method}</span></td>
                 <td><span className={`badge badge-${p.payment_status === 'completed' ? 'available' : 'occupied'}`}>{p.payment_status}</span></td>
                 <td>{p.transaction_id || '-'}</td>

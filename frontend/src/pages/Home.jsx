@@ -72,7 +72,7 @@ const Home = () => {
                     <h3>{item.name}</h3>
                     <p>{item.description}</p>
                     <div className="menu-footer">
-                      <strong>${parseFloat(item.price).toFixed(2)}</strong>
+                      <strong>RWF {parseFloat(item.price).toFixed(0)}</strong>
                       <span className="badge badge-available">Available</span>
                     </div>
                   </div>
