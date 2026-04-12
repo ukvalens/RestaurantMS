@@ -52,7 +52,7 @@ const RWANDA_DISTRICTS = {
 };
 
 const BASE_FEE = 500;      // RWF base fee
-const RATE_PER_KM = 150;   // RWF per km
+const RATE_PER_KM = 10;    // RWF per km
 
 const calcFee = (km) => Math.round(BASE_FEE + RATE_PER_KM * km);
 
