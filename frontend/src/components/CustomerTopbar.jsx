@@ -48,6 +48,7 @@ const CustomerTopbar = ({ onMenuClick }) => {
             <hr className="dropdown-divider" />
             <Link to="/customer/profile" className="dropdown-item" onClick={() => setOpen(false)}>👤 My Profile</Link>
             <Link to="/customer/my-reservations" className="dropdown-item" onClick={() => setOpen(false)}>📋 My Reservations</Link>
+            <Link to="/customer/my-deliveries" className="dropdown-item" onClick={() => setOpen(false)}>🚚 My Deliveries</Link>
             <hr className="dropdown-divider" />
             <button className="dropdown-item dropdown-logout" onClick={handleLogout}>🚪 Logout</button>
           </div>

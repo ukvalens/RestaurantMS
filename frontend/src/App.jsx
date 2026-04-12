@@ -26,8 +26,10 @@ import CustomerProfile from './pages/customer/CustomerProfile';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
 import MyOrders from './pages/customer/MyOrders';
 import Announcements from './pages/Announcements';
+import Deliveries from './pages/Deliveries';
+import MyDeliveries from './pages/customer/MyDeliveries';
 
-const STAFF = ['admin', 'manager', 'waiter'];
+const STAFF = ['admin', 'manager', 'waiter', 'delivery'];
 
 function App() {
   return (
@@ -55,6 +57,7 @@ function App() {
             <Route path="change-password" element={<ChangePassword />} />
             <Route path="settings" element={<ProtectedRoute roles={['admin']}><Settings /></ProtectedRoute>} />
             <Route path="announcements" element={<Announcements />} />
+            <Route path="deliveries" element={<Deliveries />} />
             <Route path="*" element={<Navigate to="/app/dashboard" />} />
           </Route>
 
@@ -66,6 +69,7 @@ function App() {
             <Route path="reserve" element={<CustomerReserve />} />
             <Route path="my-reservations" element={<MyReservations />} />
             <Route path="my-orders" element={<MyOrders />} />
+            <Route path="my-deliveries" element={<MyDeliveries />} />
             <Route path="announcements" element={<Announcements />} />
             <Route path="profile" element={<CustomerProfile />} />
             <Route path="change-password" element={<ChangePassword />} />

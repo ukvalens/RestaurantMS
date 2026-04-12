@@ -2,10 +2,11 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
-  { to: '/app/dashboard', label: '📊 Dashboard', roles: ['admin', 'manager', 'waiter'] },
+  { to: '/app/dashboard', label: '📊 Dashboard', roles: ['admin', 'manager', 'waiter', 'delivery'] },
   { to: '/app/tables', label: '🪑 Tables', roles: ['admin', 'manager', 'waiter'] },
   { to: '/app/menu', label: '🍽️ Menu', roles: ['admin', 'manager', 'waiter'] },
   { to: '/app/orders', label: '📋 Orders', roles: ['admin', 'manager', 'waiter'] },
+  { to: '/app/deliveries', label: '🚚 Deliveries', roles: ['admin', 'manager', 'waiter', 'delivery'] },
   { to: '/app/reservations', label: '📅 Reservations', roles: ['admin', 'manager', 'waiter'] },
   { to: '/app/payments', label: '💳 Payments', roles: ['admin', 'manager'] },
   { to: '/app/users', label: '👥 User Management', roles: ['admin'] },

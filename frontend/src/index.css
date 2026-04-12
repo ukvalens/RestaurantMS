@@ -184,6 +184,12 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
 .badge-completed, .badge-available { background: #d1fae5; color: #065f46; }
 .badge-cancelled, .badge-occupied { background: #fee2e2; color: #991b1b; }
 .badge-reserved, .badge-confirmed { background: #dbeafe; color: #1e40af; }
+.badge-delivery-pending { background: #fef3c7; color: #92400e; }
+.badge-delivery-assigned { background: #dbeafe; color: #1e40af; }
+.badge-delivery-picked_up { background: #ede9fe; color: #5b21b6; }
+.badge-delivery-in_transit { background: #cffafe; color: #0e7490; }
+.badge-delivery-delivered { background: #d1fae5; color: #065f46; }
+.badge-delivery-cancelled { background: #fee2e2; color: #991b1b; }
 
 /* Tabs */
 .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
@@ -410,6 +416,10 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
   .users-table-wrapper { display: none; }
   .users-card-list { display: flex; }
 
+  /* Delivery table → cards on mobile */
+  .delivery-card-list { display: flex; }
+  .delivery-table-wrapper { display: none; }
+
   /* Modal */
   .modal { width: 95%; padding: 1.5rem; }
   .form-buttons { flex-direction: column; }
@@ -456,6 +466,25 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
   .data-table { font-size: 0.85rem; }
   .data-table th, .data-table td { padding: 0.6rem 0.75rem; }
 }
+
+/* ===== DELIVERY ===== */
+.delivery-card-list { display: none; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+.delivery-table-wrapper { overflow-x: auto; }
+.delivery-card { background: var(--card-bg); border-radius: 12px; padding: 1rem; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+.delivery-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.delivery-card-address { font-size: 0.88rem; color: var(--text); margin-bottom: 0.4rem; }
+.delivery-card-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.6rem; }
+.delivery-card-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.6rem; }
+
+/* Delivery progress tracker */
+.delivery-progress { display: flex; align-items: flex-start; gap: 0; margin-top: 1rem; overflow-x: auto; padding-bottom: 0.25rem; }
+.delivery-step { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 70px; position: relative; }
+.delivery-step:not(:last-child)::after { content: ''; position: absolute; top: 7px; left: 50%; width: 100%; height: 2px; background: var(--border); z-index: 0; }
+.delivery-step.active:not(:last-child)::after { background: var(--primary); }
+.delivery-step-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--border); border: 2px solid var(--border); z-index: 1; margin-bottom: 0.3rem; flex-shrink: 0; }
+.delivery-step.active .delivery-step-dot { background: var(--primary); border-color: var(--primary); }
+.delivery-step span { font-size: 0.68rem; color: var(--text-muted); text-align: center; text-transform: capitalize; }
+.delivery-step.active span { color: var(--primary); font-weight: 600; }
 
 /* Users Page */
 .content h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; }

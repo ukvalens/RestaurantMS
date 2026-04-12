@@ -26,13 +26,31 @@ exports.createReservation = async (req, res) => {
 
 exports.updateReservationStatus = async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, customer_name, customer_phone, customer_email, table_id, reservation_date, reservation_time, party_size, special_requests } = req.body;
   try {
-    const result = await pool.query(
-      'UPDATE reservations SET status = $1 WHERE id = $2 RETURNING *',
-      [status, id]
-    );
+    let result;
+    if (customer_name) {
+      result = await pool.query(
+        'UPDATE reservations SET status = $1, customer_name = $2, customer_phone = $3, customer_email = $4, table_id = $5, reservation_date = $6, reservation_time = $7, party_size = $8, special_requests = $9 WHERE id = $10 RETURNING *',
+        [status, customer_name, customer_phone, customer_email, table_id, reservation_date, reservation_time, party_size, special_requests, id]
+      );
+    } else {
+      result = await pool.query(
+        'UPDATE reservations SET status = $1 WHERE id = $2 RETURNING *',
+        [status, id]
+      );
+    }
     res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.deleteReservation = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM reservations WHERE id = $1', [id]);
+    res.json({ message: 'Reservation deleted' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

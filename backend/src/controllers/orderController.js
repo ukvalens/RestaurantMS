@@ -73,3 +73,20 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.deleteOrder = async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('DELETE FROM order_items WHERE order_id = $1', [id]);
+    await client.query('DELETE FROM orders WHERE id = $1', [id]);
+    await client.query('COMMIT');
+    res.json({ message: 'Order deleted' });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
+  }
+};

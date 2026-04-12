@@ -6,9 +6,12 @@ const upload = require('../middleware/upload');
 
 router.get('/categories', menuController.getCategories);
 router.post('/categories', authMiddleware, roleCheck('admin', 'manager'), menuController.createCategory);
+router.put('/categories/:id', authMiddleware, roleCheck('admin', 'manager'), menuController.updateCategory);
+router.delete('/categories/:id', authMiddleware, roleCheck('admin', 'manager'), menuController.deleteCategory);
 router.get('/items', menuController.getMenuItems);
 router.post('/items', authMiddleware, roleCheck('admin', 'manager'), menuController.createMenuItem);
 router.put('/items/:id', authMiddleware, roleCheck('admin', 'manager'), menuController.updateMenuItem);
+router.patch('/items/:id/availability', authMiddleware, roleCheck('admin', 'manager'), menuController.toggleItemAvailability);
 router.delete('/items/:id', authMiddleware, roleCheck('admin', 'manager'), menuController.deleteMenuItem);
 router.post('/items/:id/image', authMiddleware, roleCheck('admin', 'manager'), upload.single('image'), menuController.uploadMenuItemImage);
 

@@ -28,7 +28,7 @@ exports.register = async (req, res) => {
     }
     
     // Validate role
-    const validRoles = ['admin', 'manager', 'waiter', 'chef', 'customer'];
+    const validRoles = ['admin', 'manager', 'waiter', 'chef', 'customer', 'delivery'];
     if (!validRoles.includes(role)) {
       console.log('[Register] Invalid role:', role);
       return res.status(400).json({ error: 'Invalid role. Must be: admin, manager, waiter, chef, or customer' });

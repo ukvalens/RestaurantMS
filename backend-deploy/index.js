@@ -10,6 +10,7 @@ const tableRoutes = require('./routes/tableRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
+const deliveryRoutes = require('./routes/deliveryRoutes');
 const pool = require('./config/database');
 
 const app = express();
@@ -99,6 +100,7 @@ app.use('/api/tables', tableRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/announcements', announcementRoutes);
+app.use('/api/deliveries', deliveryRoutes);
 
 if (require.main === module) {
   const PORT = process.env.PORT || 5000;

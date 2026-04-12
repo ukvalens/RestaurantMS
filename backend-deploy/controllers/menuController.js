@@ -22,6 +22,30 @@ exports.createCategory = async (req, res) => {
   }
 };
 
+exports.updateCategory = async (req, res) => {
+  const { id } = req.params;
+  const { name, description } = req.body;
+  try {
+    const result = await pool.query(
+      'UPDATE menu_categories SET name = $1, description = $2 WHERE id = $3 RETURNING *',
+      [name, description, id]
+    );
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.deleteCategory = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM menu_categories WHERE id = $1', [id]);
+    res.json({ message: 'Category deleted' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.getMenuItems = async (req, res) => {
   try {
     const result = await pool.query(
@@ -48,11 +72,24 @@ exports.createMenuItem = async (req, res) => {
 
 exports.updateMenuItem = async (req, res) => {
   const { id } = req.params;
-  const { name, description, price, is_available } = req.body;
+  const { name, description, price, is_available, category_id } = req.body;
   try {
     const result = await pool.query(
-      'UPDATE menu_items SET name = $1, description = $2, price = $3, is_available = $4 WHERE id = $5 RETURNING *',
-      [name, description, price, is_available, id]
+      'UPDATE menu_items SET name = $1, description = $2, price = $3, is_available = $4, category_id = COALESCE($5, category_id) WHERE id = $6 RETURNING *',
+      [name, description, price, is_available, category_id || null, id]
+    );
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.toggleItemAvailability = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      'UPDATE menu_items SET is_available = NOT is_available WHERE id = $1 RETURNING *',
+      [id]
     );
     res.json(result.rows[0]);
   } catch (error) {

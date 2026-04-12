@@ -13,6 +13,7 @@ const Menu = () => {
   const [showItemForm, setShowItemForm] = useState(false);
   const [showCatForm, setShowCatForm] = useState(false);
   const [editItem, setEditItem] = useState(null);
+  const [editCat, setEditCat] = useState(null);
   const [itemForm, setItemForm] = useState({ category_id: '', name: '', description: '', price: '', image_url: '' });
   const [catForm, setCatForm] = useState({ name: '', description: '' });
   const [catPage, setCatPage] = useState(1);
@@ -36,13 +37,43 @@ const Menu = () => {
   const handleCreateCategory = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/menu/categories', catForm);
-      toast.success('Category created!');
+      if (editCat) {
+        await api.put(`/menu/categories/${editCat.id}`, catForm);
+        toast.success('Category updated!');
+      } else {
+        await api.post('/menu/categories', catForm);
+        toast.success('Category created!');
+      }
       setCatForm({ name: '', description: '' });
       setShowCatForm(false);
+      setEditCat(null);
       window.history.replaceState(null, '', window.location.pathname);
       fetchAll();
     } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
+  };
+
+  const handleDeleteCategory = async (id) => {
+    if (!confirm('Delete this category? Items in it may be affected.')) return;
+    try {
+      await api.delete(`/menu/categories/${id}`);
+      toast.success('Category deleted!');
+      fetchAll();
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to delete'); }
+  };
+
+  const startEditCat = (cat) => {
+    setEditCat(cat);
+    setCatForm({ name: cat.name, description: cat.description || '' });
+    setShowCatForm(true);
+    setActiveTab('categories');
+  };
+
+  const handleToggleAvailability = async (item) => {
+    try {
+      await api.patch(`/menu/items/${item.id}/availability`);
+      toast.success(`Item marked ${item.is_available ? 'unavailable' : 'available'}!`);
+      fetchAll();
+    } catch { toast.error('Failed'); }
   };
 
   const handleItemSubmit = async (e) => {
@@ -113,7 +144,7 @@ const Menu = () => {
         <h1 className="page-title">Menu</h1>
         {canManage && (
           <div className="btn-group">
-            <button className="btn-secondary" onClick={() => setShowCatForm(!showCatForm)}>+ Category</button>
+            <button className="btn-secondary" onClick={() => { setShowCatForm(!showCatForm); setEditCat(null); setCatForm({ name: '', description: '' }); }}>+ Category</button>
             <button className="btn-primary" onClick={() => { setShowItemForm(!showItemForm); setEditItem(null); setItemForm({ category_id: '', name: '', description: '', price: '', image_url: '' }); }}>+ Item</button>
           </div>
         )}
@@ -121,11 +152,14 @@ const Menu = () => {
 
       {showCatForm && canManage && (
         <div className="card">
-          <h2>New Category</h2>
+          <h2>{editCat ? 'Edit Category' : 'New Category'}</h2>
           <form onSubmit={handleCreateCategory} className="form-grid">
             <input placeholder="Category Name" value={catForm.name} onChange={e => setCatForm({ ...catForm, name: e.target.value })} required />
             <input placeholder="Description" value={catForm.description} onChange={e => setCatForm({ ...catForm, description: e.target.value })} />
-            <button type="submit" className="btn-primary">Create</button>
+            <div className="btn-group">
+              <button type="submit" className="btn-primary">{editCat ? 'Update' : 'Create'}</button>
+              {editCat && <button type="button" className="btn-secondary" onClick={() => { setEditCat(null); setCatForm({ name: '', description: '' }); setShowCatForm(false); }}>Cancel</button>}
+            </div>
           </form>
         </div>
       )}
@@ -201,6 +235,9 @@ const Menu = () => {
                       <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleImageUpload(e, item.id)} />
                     </label>
                     <button className="btn-secondary btn-sm" onClick={() => startEdit(item)}>Edit</button>
+                    <button className={`btn-sm ${item.is_available ? 'btn-danger' : 'btn-secondary'}`} onClick={() => handleToggleAvailability(item)}>
+                      {item.is_available ? '🔴 Disable' : '🟢 Enable'}
+                    </button>
                     <button className="btn-danger btn-sm" onClick={() => handleDelete(item.id)}>Delete</button>
                   </div>
                 )}
@@ -219,12 +256,22 @@ const Menu = () => {
       {activeTab === 'categories' && (
         <div className="card">
           <table className="data-table">
-            <thead><tr><th>ID</th><th>Name</th><th>Description</th></tr></thead>
+            <thead><tr><th>ID</th><th>Name</th><th>Description</th>{canManage && <th>Actions</th>}</tr></thead>
             <tbody>
               {categories
                 .slice((catPage - 1) * CAT_PER_PAGE, catPage * CAT_PER_PAGE)
                 .map(c => (
-                  <tr key={c.id}><td>{c.id}</td><td>{c.name}</td><td>{c.description}</td></tr>
+                  <tr key={c.id}>
+                    <td>{c.id}</td><td>{c.name}</td><td>{c.description}</td>
+                    {canManage && (
+                      <td>
+                        <div className="btn-group">
+                          <button className="btn-secondary btn-sm" onClick={() => startEditCat(c)}>Edit</button>
+                          <button className="btn-danger btn-sm" onClick={() => handleDeleteCategory(c.id)}>Delete</button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
                 ))}
             </tbody>
           </table>

@@ -11,6 +11,7 @@ const Orders = () => {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [form, setForm] = useState({ table_id: '', items: [{ menu_item_id: '', quantity: 1, price: '', special_instructions: '' }] });
+  const [orderDetail, setOrderDetail] = useState(null);
   const { user } = useAuth();
 
   const fetchOrders = async () => {
@@ -59,6 +60,13 @@ const Orders = () => {
       toast.success('Status updated!');
       fetchOrders();
     } catch { toast.error('Failed'); }
+  };
+
+  const viewOrderDetail = async (id) => {
+    try {
+      const res = await api.get(`/orders/${id}`);
+      setOrderDetail(res.data);
+    } catch { toast.error('Failed to load order details'); }
   };
 
   const handleDelete = async (id) => {
@@ -134,7 +142,7 @@ const Orders = () => {
         <p className="menu-count">{filtered.length} order{filtered.length !== 1 ? 's' : ''} found</p>
         <table className="data-table">
           <thead>
-            <tr><th>ID</th><th>Table</th><th>Waiter</th><th>Amount</th><th>Status</th><th>Update Status</th>{user?.role === 'admin' && <th>Action</th>}</tr>
+            <tr><th>ID</th><th>Table</th><th>Waiter</th><th>Amount</th><th>Status</th><th>Update Status</th><th>Details</th>{['admin','manager'].includes(user?.role) && <th>Action</th>}</tr>
           </thead>
           <tbody>
             {filtered.map(o => (
@@ -149,7 +157,8 @@ const Orders = () => {
                     {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </td>
-                {user?.role === 'admin' && (
+                <td><button className="btn-secondary btn-sm" onClick={() => viewOrderDetail(o.id)}>🔍 View</button></td>
+                {['admin','manager'].includes(user?.role) && (
                   <td><button className="btn-danger btn-sm" onClick={() => handleDelete(o.id)}>🗑 Delete</button></td>
                 )}
               </tr>
@@ -157,6 +166,31 @@ const Orders = () => {
           </tbody>
         </table>
       </div>
+      {orderDetail && (
+        <div className="modal-overlay" onClick={() => setOrderDetail(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h2>Order #{orderDetail.order?.id} Details</h2>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>Table {orderDetail.order?.table_id} &bull; Status: <span className={`badge badge-${orderDetail.order?.status}`}>{orderDetail.order?.status}</span></p>
+            <table className="data-table">
+              <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Instructions</th></tr></thead>
+              <tbody>
+                {orderDetail.items?.map((it, i) => (
+                  <tr key={i}>
+                    <td>{it.name || 'Deleted item'}</td>
+                    <td>{it.quantity}</td>
+                    <td>RWF {parseFloat(it.price).toFixed(0)}</td>
+                    <td>{it.special_instructions || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div style={{ marginTop: '1rem', fontWeight: 600 }}>Total: RWF {orderDetail.items?.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(0)}</div>
+            <div className="form-buttons" style={{ marginTop: '1rem' }}>
+              <button className="btn-secondary" onClick={() => setOrderDetail(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

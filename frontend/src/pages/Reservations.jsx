@@ -7,6 +7,7 @@ const Reservations = () => {
   const [reservations, setReservations] = useState([]);
   const [tables, setTables] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editReservation, setEditReservation] = useState(null);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterDate, setFilterDate] = useState('');
@@ -44,6 +45,20 @@ const Reservations = () => {
       toast.success('Status updated!');
       fetchAll();
     } catch { toast.error('Failed'); }
+  };
+
+  const handleEdit = async (e) => {
+    e.preventDefault();
+    try {
+      await api.put(`/reservations/${editReservation.id}`, {
+        ...editReservation,
+        table_id: +editReservation.table_id,
+        party_size: +editReservation.party_size
+      });
+      toast.success('Reservation updated!');
+      setEditReservation(null);
+      fetchAll();
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };
 
   const handleDelete = async (id) => {
@@ -107,7 +122,7 @@ const Reservations = () => {
         <p className="menu-count">{filtered.length} reservation{filtered.length !== 1 ? 's' : ''} found</p>
         <table className="data-table">
           <thead>
-            <tr><th>ID</th><th>Customer</th><th>Phone</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th>{canManage && <th>Update</th>}{user?.role === 'admin' && <th>Action</th>}</tr>
+            <tr><th>ID</th><th>Customer</th><th>Phone</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th>{canManage && <th>Update</th>}{canManage && <th>Actions</th>}</tr>
           </thead>
           <tbody>
             {filtered.map(r => (
@@ -127,14 +142,46 @@ const Reservations = () => {
                     </select>
                   </td>
                 )}
-                {user?.role === 'admin' && (
-                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(r.id)}>🗑 Delete</button></td>
+                {canManage && (
+                  <td>
+                    <div className="btn-group">
+                      <button className="btn-secondary btn-sm" onClick={() => setEditReservation({ ...r, reservation_date: r.reservation_date?.split('T')[0] })}>Edit</button>
+                      <button className="btn-danger btn-sm" onClick={() => handleDelete(r.id)}>🗑 Delete</button>
+                    </div>
+                  </td>
                 )}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {editReservation && canManage && (
+        <div className="modal-overlay" onClick={() => setEditReservation(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h2>Edit Reservation #{editReservation.id}</h2>
+            <form onSubmit={handleEdit} className="form-grid">
+              <input placeholder="Customer Name" value={editReservation.customer_name} onChange={e => setEditReservation({ ...editReservation, customer_name: e.target.value })} required />
+              <input placeholder="Phone" value={editReservation.customer_phone} onChange={e => setEditReservation({ ...editReservation, customer_phone: e.target.value })} required />
+              <input type="email" placeholder="Email" value={editReservation.customer_email || ''} onChange={e => setEditReservation({ ...editReservation, customer_email: e.target.value })} />
+              <select value={editReservation.table_id} onChange={e => setEditReservation({ ...editReservation, table_id: e.target.value })} required>
+                <option value="">Select Table</option>
+                {tables.map(t => <option key={t.id} value={t.id}>Table {t.table_number} (cap: {t.capacity})</option>)}
+              </select>
+              <input type="date" value={editReservation.reservation_date} onChange={e => setEditReservation({ ...editReservation, reservation_date: e.target.value })} required />
+              <input type="time" value={editReservation.reservation_time} onChange={e => setEditReservation({ ...editReservation, reservation_time: e.target.value })} required />
+              <input type="number" placeholder="Party Size" value={editReservation.party_size} onChange={e => setEditReservation({ ...editReservation, party_size: e.target.value })} required />
+              <input placeholder="Special Requests" value={editReservation.special_requests || ''} onChange={e => setEditReservation({ ...editReservation, special_requests: e.target.value })} />
+              <select value={editReservation.status} onChange={e => setEditReservation({ ...editReservation, status: e.target.value })}>
+                {['pending', 'confirmed', 'cancelled', 'completed'].map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+              <div className="form-buttons">
+                <button type="submit" className="btn-primary">Save Changes</button>
+                <button type="button" className="btn-secondary" onClick={() => setEditReservation(null)}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
