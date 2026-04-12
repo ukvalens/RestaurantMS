@@ -1,25 +1,41 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from '../api/axios';
 import toast from 'react-hot-toast';
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     try {
       const u = await login(form.email, form.password);
       toast.success('Welcome back!');
       navigate(u.role === 'customer' ? '/customer/menu' : '/app/dashboard');
-    } catch {
-      toast.error('Invalid credentials');
+    } catch (err) {
+      const errMsg = err.response?.data?.error || err.message || 'Invalid credentials';
+      setError(errMsg);
+      console.error('Login error:', errMsg, err);
+      toast.error(errMsg);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const testBackendConnection = async () => {
+    try {
+      const res = await api.get('/health');
+      toast.success('✅ Backend connected');
+    } catch (err) {
+      toast.error('❌ Backend connection failed');
+      console.error('Backend test error:', err);
     }
   };
 
@@ -55,6 +71,10 @@ const Login = () => {
             </div>
             <button type="submit" className="auth-submit-btn" disabled={loading}>
               {loading ? <span className="auth-btn-loading">Signing in...</span> : 'Sign In →'}
+            </button>
+            {error && <div style={{ color: '#ef4444', fontSize: '0.9rem', marginTop: '0.5rem' }}>⚠️ {error}</div>}
+            <button type="button" className="auth-submit-btn" style={{ marginTop: '0.5rem', background: '#6366f1', fontSize: '0.85rem' }} onClick={testBackendConnection}>
+              🔧 Test Backend
             </button>
           </form>
           <div className="auth-links">
