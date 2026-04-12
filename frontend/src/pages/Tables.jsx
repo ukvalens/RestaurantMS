@@ -9,6 +9,8 @@ const Tables = () => {
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 8;
   const { user } = useAuth();
   const canManage = ['admin', 'manager'].includes(user?.role);
 
@@ -90,8 +92,8 @@ const Tables = () => {
       </div>
       <p className="menu-count">{filtered.length} table{filtered.length !== 1 ? 's' : ''} found</p>
 
-          <div className="tables-grid">
-        {filtered.map(t => (
+      <div className="tables-grid">
+        {filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map(t => (
           <div key={t.id} className="table-card" style={{ borderTop: `4px solid ${statusColor[t.status]}` }}>
             <h3>Table {t.table_number}</h3>
             <p>Capacity: {t.capacity}</p>
@@ -108,6 +110,12 @@ const Tables = () => {
             )}
           </div>
         ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', alignItems: 'center' }}>
+        <button className="btn-secondary" onClick={() => setPage(p => p - 1)} disabled={page === 1}>← Prev</button>
+        <span>Page {page} of {Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))}</span>
+        <button className="btn-secondary" onClick={() => setPage(p => p + 1)} disabled={page >= Math.ceil(filtered.length / PAGE_SIZE)}>Next →</button>
       </div>
     </div>
   );
