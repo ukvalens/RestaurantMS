@@ -284,6 +284,15 @@ r.delete('/menu/items/:id', authMiddleware, roleCheck('admin', 'manager'), async
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+r.post('/menu/items/:id/image', authMiddleware, roleCheck('admin', 'manager'), upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+    const r = await pool.query('UPDATE menu_items SET image_url=$1 WHERE id=$2 RETURNING *', [base64, req.params.id]);
+    res.json(r.rows[0]);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ── TABLES ────────────────────────────────────────────────────────────────────
 r.get('/tables', authMiddleware, async (req, res) => {
   try { res.json((await pool.query('SELECT * FROM tables ORDER BY table_number')).rows); }
