@@ -1,0 +1,1 @@
+web: node --dns-result-order=ipv4first src/server.js
