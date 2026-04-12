@@ -33,6 +33,7 @@ const Reservations = () => {
       toast.success('Reservation created!');
       setShowForm(false);
       setForm({ customer_name: '', customer_phone: '', customer_email: '', table_id: '', reservation_date: '', reservation_time: '', party_size: '', special_requests: '' });
+      window.history.replaceState(null, '', window.location.pathname);
       fetchAll();
     } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };

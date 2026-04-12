@@ -38,6 +38,7 @@ const Menu = () => {
       toast.success('Category created!');
       setCatForm({ name: '', description: '' });
       setShowCatForm(false);
+      window.history.replaceState(null, '', window.location.pathname);
       fetchAll();
     } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };
@@ -55,6 +56,7 @@ const Menu = () => {
       setItemForm({ category_id: '', name: '', description: '', price: '', image_url: '' });
       setShowItemForm(false);
       setEditItem(null);
+      window.history.replaceState(null, '', window.location.pathname);
       fetchAll();
     } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };

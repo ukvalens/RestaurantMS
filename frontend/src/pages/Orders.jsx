@@ -48,6 +48,7 @@ const Orders = () => {
       toast.success('Order created!');
       setShowForm(false);
       setForm({ table_id: '', items: [{ menu_item_id: '', quantity: 1, price: '', special_instructions: '' }] });
+      window.history.replaceState(null, '', window.location.pathname);
       fetchOrders();
     } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };

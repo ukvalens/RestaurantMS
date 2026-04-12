@@ -28,6 +28,7 @@ const Tables = () => {
       toast.success('Table created!');
       setForm({ table_number: '', capacity: '' });
       setShowForm(false);
+      window.history.replaceState(null, '', window.location.pathname);
       fetchTables();
     } catch (err) { toast.error(err.response?.data?.error || 'Failed to create table'); }
   };

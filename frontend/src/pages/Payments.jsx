@@ -33,6 +33,7 @@ const Payments = () => {
       toast.success('Payment processed!');
       setShowForm(false);
       setForm({ order_id: '', amount: '', payment_method: 'cash', transaction_id: '' });
+      window.history.replaceState(null, '', window.location.pathname);
       fetchAll();
     } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };
