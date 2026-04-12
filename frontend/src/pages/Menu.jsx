@@ -19,7 +19,7 @@ const Menu = () => {
   const [catPage, setCatPage] = useState(1);
   const CAT_PER_PAGE = 5;
   const [itemPage, setItemPage] = useState(1);
-  const ITEMS_PER_PAGE = 3;
+  const ITEMS_PER_PAGE = 6;
   const { user } = useAuth();
   const canManage = ['admin', 'manager'].includes(user?.role);
   const [viewImage, setViewImage] = useState(null);

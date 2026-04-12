@@ -15,6 +15,8 @@ const CustomerMenu = () => {
   const [tableId, setTableId] = useState('');
   const [placing, setPlacing] = useState(false);
   const [viewImage, setViewImage] = useState(null);
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 6;
 
   useEffect(() => {
     api.get('/menu/categories').then(r => setCategories(r.data));
@@ -28,6 +30,12 @@ const CustomerMenu = () => {
     const matchCat = filterCategory ? item.category_id === +filterCategory : true;
     return matchSearch && matchCat;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+  const handleSearchChange = (val) => { setSearch(val); setPage(1); };
+  const handleCatChange = (val) => { setFilterCategory(val); setPage(1); };
 
   const addToCart = (item) => {
     setCart(prev => {
@@ -88,13 +96,13 @@ const CustomerMenu = () => {
 
       <div className="menu-filters">
         <input placeholder="🔍 Search by name or description..." value={search}
-          onChange={e => setSearch(e.target.value)} className="menu-search" />
-        <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)}>
+          onChange={e => handleSearchChange(e.target.value)} className="menu-search" />
+        <select value={filterCategory} onChange={e => handleCatChange(e.target.value)}>
           <option value="">All Categories</option>
           {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
         {(search || filterCategory) && (
-          <button className="btn-secondary btn-sm" onClick={() => { setSearch(''); setFilterCategory(''); }}>✕ Clear</button>
+          <button className="btn-secondary btn-sm" onClick={() => { handleSearchChange(''); handleCatChange(''); }}>✕ Clear</button>
         )}
       </div>
       <p className="menu-count">{filtered.length} item{filtered.length !== 1 ? 's' : ''} found</p>
@@ -102,7 +110,7 @@ const CustomerMenu = () => {
       <div className="menu-grid">
         {filtered.length === 0 ? (
           <p className="no-results">No items match your search.</p>
-        ) : filtered.map(item => {
+        ) : paged.map(item => {
           const inCart = cart.find(c => c.id === item.id);
           return (
             <div key={item.id} className="menu-card">
@@ -128,6 +136,16 @@ const CustomerMenu = () => {
           );
         })}
       </div>
+
+      {totalPages > 1 && (
+        <div className="pagination" style={{ marginTop: '1.25rem' }}>
+          <button className="page-btn" onClick={() => setPage(p => p - 1)} disabled={page === 1}>← Prev</button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button key={i} className={`page-btn ${page === i + 1 ? 'page-btn-active' : ''}`} onClick={() => setPage(i + 1)}>{i + 1}</button>
+          ))}
+          <button className="page-btn" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages}>Next →</button>
+        </div>
+      )}
 
       {/* Image Modal */}
       {viewImage && (
