@@ -148,7 +148,7 @@ const CustomerMenu = () => {
       {showCart && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}>
           <div style={{ flex: 1, background: 'rgba(0,0,0,0.4)' }} onClick={() => setShowCart(false)} />
-          <div style={{ width: 420, background: 'white', display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 20px rgba(0,0,0,0.15)', overflowY: 'auto' }}>
+          <div style={{ width: 'min(420px, 100vw)', background: 'white', display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 20px rgba(0,0,0,0.15)', overflowY: 'auto' }}>
             <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ fontSize: '1.1rem' }}>🛒 Your Cart</h2>
               <button className="btn-secondary btn-sm" onClick={() => setShowCart(false)}>✕ Close</button>

@@ -295,6 +295,8 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
   .customer-nav-links { width: 100%; justify-content: center; }
   .customer-menu-grid { grid-template-columns: 1fr; }
   .customer-main { padding: 1rem; }
+  /* Cart drawer full width on small mobile */
+  .cart-drawer { width: 100vw !important; }
 }
 
 /* ===== RESPONSIVE ===== */
