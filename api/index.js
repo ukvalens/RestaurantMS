@@ -5,16 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { Pool } = require('pg');
 require('dotenv').config();
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 const app = express();
 const pool = new Pool({
@@ -29,18 +21,8 @@ const pool = new Pool({
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'restaurant-management/avatars',
-    format: async (req, file) => 'png',
-    public_id: (req, file) => `avatar_${req.user?.id || 'guest'}_${Date.now()}`,
-    resource_type: 'auto',
-  },
-});
-
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = /jpeg|jpg|png|webp/;
@@ -206,8 +188,8 @@ r.post('/auth/avatar/remove', authMiddleware, async (req, res) => {
 r.post('/auth/avatar', authMiddleware, upload.single('avatar'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    const avatarUrl = req.file.path;
-    const r = await pool.query('UPDATE users SET avatar_url=$1 WHERE id=$2 RETURNING id,username,email,role,avatar_url', [avatarUrl, req.user.id]);
+    const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+    const r = await pool.query('UPDATE users SET avatar_url=$1 WHERE id=$2 RETURNING id,username,email,role,avatar_url', [base64, req.user.id]);
     res.json(r.rows[0]);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
