@@ -17,6 +17,8 @@ const Menu = () => {
   const [catForm, setCatForm] = useState({ name: '', description: '' });
   const [catPage, setCatPage] = useState(1);
   const CAT_PER_PAGE = 5;
+  const [itemPage, setItemPage] = useState(1);
+  const ITEMS_PER_PAGE = 3;
   const { user } = useAuth();
   const canManage = ['admin', 'manager'].includes(user?.role);
   const [viewImage, setViewImage] = useState(null);
@@ -176,7 +178,7 @@ const Menu = () => {
           <div className="menu-grid">
             {filteredItems.length === 0 ? (
               <p className="no-results">No items match your search.</p>
-            ) : filteredItems.map(item => (
+            ) : filteredItems.slice((itemPage - 1) * ITEMS_PER_PAGE, itemPage * ITEMS_PER_PAGE).map(item => (
             <div key={item.id} className="menu-card">
               {item.image_url && <img src={item.image_url} alt={item.name} className="menu-img" onError={e => e.target.style.display = 'none'} />}
               <div className="menu-card-body">
@@ -205,6 +207,11 @@ const Menu = () => {
               </div>
             </div>
             ))}
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', alignItems: 'center' }}>
+            <button className="btn-secondary" onClick={() => setItemPage(p => p - 1)} disabled={itemPage === 1}>← Prev</button>
+            <span>Page {itemPage} of {Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE))}</span>
+            <button className="btn-secondary" onClick={() => setItemPage(p => p + 1)} disabled={itemPage >= Math.ceil(filteredItems.length / ITEMS_PER_PAGE)}>Next →</button>
           </div>
         </>
       )}
