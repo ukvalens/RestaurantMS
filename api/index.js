@@ -20,9 +20,10 @@ const app = express();
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
-  max: 1,
-  idleTimeoutMillis: 10000,
-  connectionTimeoutMillis: 10000,
+  max: 20,
+  min: 2,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 15000,
 });
 
 app.use(cors({ origin: '*' }));
@@ -70,6 +71,29 @@ r.get('/health', async (req, res) => {
     res.json({ db: 'connected', jwt: !!process.env.JWT_SECRET, dbUrl: !!process.env.DATABASE_URL });
   } catch (e) {
     res.json({ db: 'failed', error: e.message, jwt: !!process.env.JWT_SECRET, dbUrl: !!process.env.DATABASE_URL });
+  }
+});
+
+r.get('/db-info', async (req, res) => {
+  try {
+    const schemaResult = await pool.query(`
+      SELECT column_name, data_type, is_nullable 
+      FROM information_schema.columns 
+      WHERE table_name = 'users'
+      ORDER BY ordinal_position
+    `);
+    
+    const countResult = await pool.query('SELECT COUNT(*) as total FROM users');
+    const firstUserResult = await pool.query('SELECT id, username, email, role FROM users LIMIT 1');
+    
+    res.json({
+      schema: schemaResult.rows,
+      totalUsers: countResult.rows[0],
+      sampleUser: firstUserResult.rows[0] || null,
+      message: 'Database diagnostic info'
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message, stack: error.stack });
   }
 });
 
