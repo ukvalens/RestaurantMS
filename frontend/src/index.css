@@ -221,6 +221,25 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
 .hero-btn-secondary { background: white; color: var(--primary); padding: 0.8rem 2rem; border-radius: 10px; font-size: 1rem; font-weight: 600; text-decoration: none; border: 1.5px solid var(--primary); transition: all 0.2s; display: inline-block; }
 .hero-btn-secondary:hover { background: #ede9fe; }
 
+/* Hero stats */
+.hero-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 3rem; flex-wrap: wrap; }
+.hero-stat { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.7); border-radius: 12px; padding: 1rem 1.5rem; min-width: 110px; box-shadow: 0 2px 8px rgba(79,70,229,0.08); }
+.hero-stat-num { font-size: 1.75rem; }
+.hero-stat span:last-child { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-align: center; }
+
+/* How it works */
+.home-how { padding: 4rem 6%; background: white; }
+.how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 900px; margin: 0 auto; }
+.how-step { text-align: center; padding: 2rem 1.5rem; }
+.how-num { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: white; font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+.how-step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.how-step p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+
+/* CTA */
+.home-cta { padding: 5rem 6%; background: linear-gradient(135deg, var(--sidebar-bg), var(--primary)); text-align: center; color: white; }
+.home-cta h2 { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
+.home-cta p { font-size: 1rem; color: rgba(255,255,255,0.8); margin-bottom: 2rem; }
+
 /* Features */
 .home-features { padding: 4rem 6%; background: white; }
 .section-header { text-align: center; margin-bottom: 2.5rem; }
@@ -235,7 +254,7 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
 
 /* Footer */
 .home-footer { background: var(--sidebar-bg); padding: 1.5rem 6% 0; }
-.footer-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .footer-col h4 { color: white; font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; }
 .footer-brand { color: white; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.75rem; }
 .footer-tagline { color: rgba(255,255,255,0.5); font-size: 0.85rem; line-height: 1.7; }
@@ -367,6 +386,11 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
   .hero-content h1 { font-size: 1.9rem; }
   .features-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
+  .how-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .hero-stats { gap: 1rem; }
+  .hero-stat { min-width: 80px; padding: 0.75rem 1rem; }
+  .home-cta { padding: 3rem 5%; }
+  .home-cta h2 { font-size: 1.5rem; }
 
   /* Auth */
   .auth-info { display: none; }
