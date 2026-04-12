@@ -12,7 +12,7 @@ const Register = () => {
   const validate = () => {
     const e = {};
     if (!form.email.includes('@')) e.email = 'Enter a valid email address';
-    if (form.password.length < 2) e.password = ['At least 2 characters'];
+    if (form.password.length < 6) e.password = ['At least 6 characters'];
     return e;
   };
 
