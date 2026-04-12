@@ -79,15 +79,6 @@ const Register = () => {
                 {errors.password.map(r => <li key={r}>✗ {r}</li>)}
               </ul>
             )}
-            <div className="auth-input-group">
-              <span className="auth-input-icon">🏷️</span>
-              <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}>
-                <option value="customer">Customer</option>
-                <option value="waiter">Waiter</option>
-                <option value="manager">Manager</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
             <button type="submit" className="auth-submit-btn" disabled={loading}>
               {loading ? 'Creating account...' : 'Create Account →'}
             </button>
