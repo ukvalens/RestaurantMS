@@ -60,10 +60,9 @@ const Profile = () => {
         {/* Picture */}
         <div className="profile-pic-section">
           <div className="profile-pic-wrapper" style={{ cursor: 'pointer', position: 'relative' }} onClick={() => fileRef.current.click()}>
-            {preview
-              ? <img src={preview} alt="profile" className="profile-pic" />
-              : <div className="profile-pic-placeholder">👤</div>
-            }
+            {preview && (
+              <img src={preview} alt="profile" className="profile-pic" />
+            )}
             <div style={{ position: 'absolute', bottom: 0, right: 0, background: 'var(--primary)', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'white' }}>✏️</div>
           </div>
           <div>

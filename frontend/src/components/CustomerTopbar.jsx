@@ -7,8 +7,6 @@ const CustomerTopbar = ({ onMenuClick }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef();
   const navigate = useNavigate();
-  const initials = user?.username?.slice(0, 2).toUpperCase() || 'C';
-  const avatarSrc = user?.avatar_url?.startsWith('data:') ? user.avatar_url : null;
 
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
@@ -26,10 +24,9 @@ const CustomerTopbar = ({ onMenuClick }) => {
       </div>
       <div className="topbar-right" ref={ref}>
         <button className="avatar-btn" onClick={() => setOpen(!open)}>
-          {avatarSrc
-            ? <img src={avatarSrc} alt="profile" className="topbar-avatar-img" />
-            : <div className="avatar">{initials}</div>
-          }
+          {user?.avatar_url && (
+            <img src={user.avatar_url} alt="profile" className="topbar-avatar-img" />
+          )}
           <div className="avatar-info">
             <span className="avatar-name">{user?.username}</span>
             <span className="avatar-role">customer</span>
@@ -39,10 +36,9 @@ const CustomerTopbar = ({ onMenuClick }) => {
         {open && (
           <div className="profile-dropdown">
             <div className="dropdown-header">
-              {avatarSrc
-                ? <img src={avatarSrc} alt="profile" className="dropdown-avatar-img" />
-                : <div className="avatar avatar-lg">{initials}</div>
-              }
+              {user?.avatar_url && (
+                <img src={user.avatar_url} alt="profile" className="dropdown-avatar-img" />
+              )}
               <div>
                 <p className="dropdown-name">{user?.username}</p>
                 <p className="dropdown-email">{user?.email}</p>

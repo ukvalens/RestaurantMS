@@ -63,10 +63,9 @@ const CustomerProfile = () => {
         {/* Profile Picture */}
         <div className="profile-pic-section">
           <div className="profile-pic-wrapper">
-            {preview
-              ? <img src={preview} alt="profile" className="profile-pic" />
-              : <div className="profile-pic-placeholder">👤</div>
-            }
+            {preview && (
+              <img src={preview} alt="profile" className="profile-pic" />
+            )}
           </div>
           <div>
             <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{user?.username}</p>
