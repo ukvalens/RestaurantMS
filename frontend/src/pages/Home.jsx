@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
+import AppFooter from '../components/AppFooter';
 
 const PAGE_SIZE = 4;
 
@@ -101,31 +102,7 @@ const Home = () => {
         )}
       </section>
 
-      {/* Footer */}
-      <footer className="home-footer">
-        <div className="footer-grid">
-          <div className="footer-col">
-            <div className="footer-brand">🍴 RestaurantMS</div>
-            <p className="footer-tagline">Your all-in-one restaurant management platform.</p>
-          </div>
-          <div className="footer-col">
-            <h4>Contact</h4>
-            <ul>
-              <li>👤 Ukwitegetse Valens</li>
-              <li>✉️ ukwitegetsev9@gmail.com</li>
-              <li>📞 +250 780 468 216</li>
-            </ul>
-          </div>
-          <div className="footer-col">
-            <h4>Quick Links</h4>
-            <ul>
-              <li><Link to="/login" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>Sign In</Link></li>
-              <li><Link to="/register" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>Register</Link></li>
-            </ul>
-          </div>
-        </div>
-        <div className="footer-bottom">© {new Date().getFullYear()} RestaurantMS. All rights reserved.</div>
-      </footer>
+      <AppFooter />
 
     </div>
   );
