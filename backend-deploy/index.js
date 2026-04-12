@@ -20,7 +20,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.get('/', (req, res) => res.json({ message: 'Restaurant Management System API' }));
+app.get('/', (req, res) => res.json({ message: 'Restaurant Management System API', version: '1.0' }));
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
