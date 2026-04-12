@@ -31,7 +31,8 @@ const Login = () => {
 
   const testBackendConnection = async () => {
     try {
-      const res = await api.get('/health');
+      const backendUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || '';
+      await api.get(backendUrl ? `${backendUrl}/health` : '/health');
       toast.success('✅ Backend connected');
     } catch (err) {
       toast.error('❌ Backend connection failed');
