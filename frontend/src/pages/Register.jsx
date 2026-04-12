@@ -9,20 +9,10 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const emailRegex = /^[a-zA-Z0-9._%+\-]{6,}@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
-  const passwordRules = [
-    { test: v => v.length >= 8,          label: 'At least 8 characters' },
-    { test: v => /[A-Z]/.test(v),        label: 'One uppercase letter' },
-    { test: v => /[a-z]/.test(v),        label: 'One lowercase letter' },
-    { test: v => /[0-9]/.test(v),        label: 'One number' },
-    { test: v => /[^A-Za-z0-9]/.test(v), label: 'One special character' },
-  ];
-
   const validate = () => {
     const e = {};
-    if (!emailRegex.test(form.email)) e.email = 'Enter a valid email address';
-    const failedRules = passwordRules.filter(r => !r.test(form.password));
-    if (failedRules.length) e.password = failedRules.map(r => r.label);
+    if (!form.email.includes('@')) e.email = 'Enter a valid email address';
+    if (form.password.length < 2) e.password = ['At least 2 characters'];
     return e;
   };
 
@@ -87,11 +77,6 @@ const Register = () => {
             {errors.password && (
               <ul className="password-rules">
                 {errors.password.map(r => <li key={r}>✗ {r}</li>)}
-              </ul>
-            )}
-            {form.password && !errors.password && (
-              <ul className="password-rules success">
-                {passwordRules.map(r => <li key={r.label} className={r.test(form.password) ? 'pass' : 'fail'}>{r.test(form.password) ? '✓' : '✗'} {r.label}</li>)}
               </ul>
             )}
             <div className="auth-input-group">
