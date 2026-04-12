@@ -29,7 +29,7 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--
 /* Topbar */
 .topbar { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 2rem; background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
 .topbar-title { font-size: 1rem; font-weight: 600; color: var(--text-muted); }
-.topbar-right { position: relative; }
+.topbar-right { position: relative; display: flex; align-items: center; gap: 0.5rem; }
 .avatar-btn { display: flex; align-items: center; gap: 0.6rem; background: none; border: 1px solid var(--border); border-radius: 10px; padding: 0.4rem 0.75rem; cursor: pointer; transition: background 0.2s; }
 .avatar-btn:hover { background: var(--bg); }
 .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
@@ -493,6 +493,46 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
 .delivery-step.active .delivery-step-dot { background: var(--primary); border-color: var(--primary); }
 .delivery-step span { font-size: 0.65rem; color: var(--text-muted); text-align: center; text-transform: capitalize; }
 .delivery-step.active span { color: var(--primary); font-weight: 600; }
+
+/* ===== NOTIFICATIONS ===== */
+.notif-wrapper { position: relative; }
+
+.notif-bell-btn { position: relative; background: none; border: 1px solid var(--border); border-radius: 10px; padding: 0.4rem 0.6rem; font-size: 1.1rem; cursor: pointer; transition: background 0.2s; line-height: 1; }
+.notif-bell-btn:hover { background: var(--bg); }
+
+.notif-badge { position: absolute; top: -6px; right: -6px; background: #dc2626; color: white; font-size: 0.65rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 999px; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid white; pointer-events: none; }
+
+.notif-dropdown { position: absolute; right: 0; top: calc(100% + 8px); width: 340px; max-width: 92vw; background: white; border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.15); z-index: 200; overflow: hidden; }
+
+.notif-header { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); }
+.notif-title { font-weight: 700; font-size: 0.95rem; }
+.notif-mark-all { background: none; border: none; color: var(--primary); font-size: 0.8rem; cursor: pointer; padding: 0; font-weight: 500; }
+.notif-mark-all:hover { text-decoration: underline; }
+
+.notif-list { max-height: 380px; overflow-y: auto; }
+
+.notif-empty { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 0.9rem; }
+.notif-empty span { font-size: 2rem; }
+
+.notif-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; cursor: pointer; transition: background 0.15s; border-bottom: 1px solid var(--border); position: relative; }
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: var(--bg); }
+.notif-item.unread { background: #f0f4ff; }
+.notif-item.unread:hover { background: #e8eeff; }
+.notif-item.unread::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--primary); border-radius: 0 2px 2px 0; }
+
+.notif-item-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.1rem; }
+.notif-item-body { flex: 1; min-width: 0; }
+.notif-item-title { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; }
+.notif-item-msg { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 0.3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.notif-item-time { font-size: 0.72rem; color: var(--text-muted); }
+.notif-item-del { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; padding: 0.2rem; border-radius: 4px; flex-shrink: 0; opacity: 0; transition: opacity 0.15s; }
+.notif-item:hover .notif-item-del { opacity: 1; }
+.notif-item-del:hover { background: var(--border); color: var(--danger); }
+
+@media (max-width: 480px) {
+  .notif-dropdown { right: -40px; width: 300px; }
+}
 
 /* ===== USER MANAGEMENT — MOBILE FIRST ===== */
 

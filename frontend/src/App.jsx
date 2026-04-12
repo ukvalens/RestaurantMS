@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import CustomerLayout from './components/CustomerLayout';
@@ -34,6 +35,7 @@ const STAFF = ['admin', 'manager', 'waiter', 'delivery'];
 function App() {
   return (
     <AuthProvider>
+      <NotificationProvider>
       <BrowserRouter>
         <Toaster position="top-right" />
         <Routes>
@@ -77,6 +79,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      </NotificationProvider>
     </AuthProvider>
   );
 }

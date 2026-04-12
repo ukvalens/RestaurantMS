@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import NotificationBell from './NotificationBell';
 
 const Topbar = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
@@ -23,6 +24,7 @@ const Topbar = ({ onMenuClick }) => {
         <h2 className="topbar-title">Welcome, {user?.username} 👋</h2>
       </div>
       <div className="topbar-right" ref={ref}>
+        <NotificationBell />
         <button className="avatar-btn" onClick={() => setOpen(!open)}>
           {user?.avatar_url && (
             <img src={user.avatar_url} alt="profile" className="topbar-avatar-img" />

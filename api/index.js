@@ -280,6 +280,10 @@ r.put('/menu/items/:id', authMiddleware, roleCheck('admin', 'manager'), async (r
   try {
     const r = await pool.query('UPDATE menu_items SET name=$1,description=$2,price=$3,is_available=$4 WHERE id=$5 RETURNING *', [name, description, price, is_available, req.params.id]);
     res.json(r.rows[0]);
+    // Low stock alert when item marked unavailable
+    if (is_available === false || is_available === 'false') {
+      createNotification('low_stock', '⚠️ Item Unavailable', `Menu item "${name}" has been marked as unavailable.`, 'manager', '/app/menu');
+    }
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -360,6 +364,8 @@ r.post('/orders', authMiddleware, async (req, res) => {
     await client.query('UPDATE tables SET status=$1 WHERE id=$2', ['occupied', table_id]);
     await client.query('COMMIT');
     res.status(201).json({ ...order, total_amount: total });
+    // Notify staff of new order
+    createNotification('new_order', '🛒 New Order Placed', `Order #${order.id} placed for Table ${table_id} — RWF ${total.toFixed(0)}`, 'waiter', '/app/orders');
   } catch (e) { await client.query('ROLLBACK'); res.status(500).json({ error: e.message }); }
   finally { client.release(); }
 });
@@ -396,6 +402,8 @@ r.post('/reservations', authMiddleware, async (req, res) => {
       [customer_name, customer_phone, customer_email, table_id, reservation_date, reservation_time, party_size, special_requests]
     );
     res.status(201).json(r.rows[0]);
+    // Notify staff of new reservation
+    createNotification('reservation', '📅 New Reservation', `${customer_name} reserved Table ${table_id} on ${reservation_date} at ${reservation_time} (party of ${party_size})`, 'manager', '/app/reservations');
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -479,6 +487,7 @@ r.post('/deliveries', authMiddleware, roleCheck('admin','manager','waiter','cust
       [order_id||null, customer_id||null, driver_id||null, delivery_address, delivery_fee||0, notes||null]
     );
     res.status(201).json(result.rows[0]);
+    createNotification('delivery', '🚚 New Delivery Request', `Delivery to "${delivery_address}" has been created.`, 'delivery', '/app/deliveries');
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -497,6 +506,86 @@ r.delete('/deliveries/:id', authMiddleware, roleCheck('admin','manager'), async 
   try {
     await pool.query('DELETE FROM deliveries WHERE id=$1', [req.params.id]);
     res.json({ message: 'Delivery deleted' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── NOTIFICATIONS ────────────────────────────────────────────────────────────
+const ensureNotificationsTable = () => pool.query(`
+  CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(50) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    role_target VARCHAR(20) DEFAULT 'all',
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    is_read BOOLEAN DEFAULT false,
+    link VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
+const createNotification = async (type, title, message, role_target = 'all', link = null) => {
+  try {
+    await ensureNotificationsTable();
+    // Get all users matching the role target
+    const roleFilter = role_target === 'all'
+      ? `WHERE role IN ('admin','manager','waiter','delivery','customer')`
+      : `WHERE role = '${role_target}' OR role = 'admin' OR role = 'manager'`;
+    const users = await pool.query(`SELECT id FROM users ${roleFilter}`);
+    for (const u of users.rows) {
+      await pool.query(
+        `INSERT INTO notifications (type,title,message,role_target,user_id,link) VALUES ($1,$2,$3,$4,$5,$6)`,
+        [type, title, message, role_target, u.id, link]
+      );
+    }
+  } catch (e) { console.error('Notification error:', e.message); }
+};
+
+// Get notifications for current user
+r.get('/notifications', authMiddleware, async (req, res) => {
+  try {
+    await ensureNotificationsTable();
+    const result = await pool.query(
+      `SELECT * FROM notifications WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50`,
+      [req.user.id]
+    );
+    res.json(result.rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Get unread count
+r.get('/notifications/unread-count', authMiddleware, async (req, res) => {
+  try {
+    await ensureNotificationsTable();
+    const result = await pool.query(
+      `SELECT COUNT(*) as count FROM notifications WHERE user_id=$1 AND is_read=false`,
+      [req.user.id]
+    );
+    res.json({ count: parseInt(result.rows[0].count) });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Mark one as read
+r.put('/notifications/:id/read', authMiddleware, async (req, res) => {
+  try {
+    await pool.query(`UPDATE notifications SET is_read=true WHERE id=$1 AND user_id=$2`, [req.params.id, req.user.id]);
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Mark all as read
+r.put('/notifications/read-all', authMiddleware, async (req, res) => {
+  try {
+    await pool.query(`UPDATE notifications SET is_read=true WHERE user_id=$1`, [req.user.id]);
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Delete a notification
+r.delete('/notifications/:id', authMiddleware, async (req, res) => {
+  try {
+    await pool.query(`DELETE FROM notifications WHERE id=$1 AND user_id=$2`, [req.params.id, req.user.id]);
+    res.json({ success: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
