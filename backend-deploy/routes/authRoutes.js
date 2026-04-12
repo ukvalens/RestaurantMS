@@ -17,5 +17,6 @@ router.get('/users', authMiddleware, roleCheck('admin'), authController.getUsers
 router.post('/users', authMiddleware, roleCheck('admin'), authController.createUser);
 router.put('/users/:id', authMiddleware, roleCheck('admin'), authController.updateUser);
 router.delete('/users/:id', authMiddleware, roleCheck('admin'), authController.deleteUser);
+router.post('/reset-user-password', authMiddleware, roleCheck('admin'), authController.resetUserPassword);
 
 module.exports = router;

@@ -232,6 +232,18 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+exports.resetUserPassword = async (req, res) => {
+  const { userId, newPassword } = req.body;
+  try {
+    if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await pool.query('UPDATE users SET password = $1, reset_pending = false WHERE id = $2', [hashed, userId]);
+    res.json({ message: 'Password reset successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   try {

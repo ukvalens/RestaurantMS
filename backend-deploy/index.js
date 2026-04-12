@@ -15,7 +15,7 @@ const pool = require('./config/database');
 const app = express();
 
 app.use(cors({
-  origin: ['https://frontend-rouge-omega-41.vercel.app', 'https://restaurant-ms-one.vercel.app', 'http://localhost:5173'],
+  origin: ['https://frontend-rouge-omega-41.vercel.app', 'https://restaurant-ms-one.vercel.app', 'https://restaurant-management-system-kappa-eight.vercel.app', 'http://localhost:5173'],
   credentials: true
 }));
 app.use(express.json());
