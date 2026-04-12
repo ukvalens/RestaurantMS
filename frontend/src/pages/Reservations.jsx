@@ -3,6 +3,8 @@ import api from '../api/axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
+const STATUSES = ['pending', 'confirmed', 'cancelled', 'completed'];
+
 const Reservations = () => {
   const [reservations, setReservations] = useState([]);
   const [tables, setTables] = useState([]);
@@ -11,11 +13,7 @@ const Reservations = () => {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterDate, setFilterDate] = useState('');
-  const [form, setForm] = useState({
-    customer_name: '', customer_phone: '', customer_email: '',
-    table_id: '', reservation_date: '', reservation_time: '',
-    party_size: '', special_requests: ''
-  });
+  const [form, setForm] = useState({ customer_name: '', customer_phone: '', customer_email: '', table_id: '', reservation_date: '', reservation_time: '', party_size: '', special_requests: '' });
   const { user } = useAuth();
   const canManage = ['admin', 'manager'].includes(user?.role);
 
@@ -34,27 +32,19 @@ const Reservations = () => {
       toast.success('Reservation created!');
       setShowForm(false);
       setForm({ customer_name: '', customer_phone: '', customer_email: '', table_id: '', reservation_date: '', reservation_time: '', party_size: '', special_requests: '' });
-      window.history.replaceState(null, '', window.location.pathname);
       fetchAll();
     } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };
 
   const updateStatus = async (id, status) => {
-    try {
-      await api.put(`/reservations/${id}`, { status });
-      toast.success('Status updated!');
-      fetchAll();
-    } catch { toast.error('Failed'); }
+    try { await api.put(`/reservations/${id}`, { status }); toast.success('Updated!'); fetchAll(); }
+    catch { toast.error('Failed'); }
   };
 
   const handleEdit = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/reservations/${editReservation.id}`, {
-        ...editReservation,
-        table_id: +editReservation.table_id,
-        party_size: +editReservation.party_size
-      });
+      await api.put(`/reservations/${editReservation.id}`, { ...editReservation, table_id: +editReservation.table_id, party_size: +editReservation.party_size });
       toast.success('Reservation updated!');
       setEditReservation(null);
       fetchAll();
@@ -63,26 +53,21 @@ const Reservations = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this reservation?')) return;
-    try {
-      await api.delete(`/reservations/${id}`);
-      toast.success('Reservation deleted!');
-      fetchAll();
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed to delete'); }
+    try { await api.delete(`/reservations/${id}`); toast.success('Deleted!'); fetchAll(); }
+    catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };
 
   const filtered = reservations.filter(r => {
-    const matchSearch = r.customer_name.toLowerCase().includes(search.toLowerCase()) ||
-      r.customer_phone.includes(search) ||
-      r.customer_email?.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = filterStatus ? r.status === filterStatus : true;
-    const matchDate = filterDate ? r.reservation_date?.split('T')[0] === filterDate : true;
-    return matchSearch && matchStatus && matchDate;
+    const q = search.toLowerCase();
+    return (r.customer_name.toLowerCase().includes(q) || r.customer_phone.includes(q) || r.customer_email?.toLowerCase().includes(q)) &&
+      (filterStatus ? r.status === filterStatus : true) &&
+      (filterDate ? r.reservation_date?.split('T')[0] === filterDate : true);
   });
 
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">Reservations</h1>
+        <h1 className="page-title">📅 Reservations</h1>
         <button className="btn-primary" onClick={() => setShowForm(!showForm)}>+ New Reservation</button>
       </div>
 
@@ -101,25 +86,61 @@ const Reservations = () => {
             <input type="time" value={form.reservation_time} onChange={e => setForm({ ...form, reservation_time: e.target.value })} required />
             <input type="number" placeholder="Party Size" value={form.party_size} onChange={e => setForm({ ...form, party_size: e.target.value })} required />
             <input placeholder="Special Requests" value={form.special_requests} onChange={e => setForm({ ...form, special_requests: e.target.value })} />
-            <button type="submit" className="btn-primary">Create Reservation</button>
+            <div className="btn-group">
+              <button type="submit" className="btn-primary">Create</button>
+              <button type="button" className="btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
+            </div>
           </form>
         </div>
       )}
 
-      <div className="card">
-        <div className="menu-filters" style={{ marginBottom: '1rem' }}>
-          <input placeholder="🔍 Search by name, phone or email..." value={search}
-            onChange={e => setSearch(e.target.value)} className="menu-search" />
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
-            <option value="">All Status</option>
-            {['pending', 'confirmed', 'cancelled', 'completed'].map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} style={{ width: 'auto' }} />
-          {(search || filterStatus || filterDate) && (
-            <button className="btn-secondary btn-sm" onClick={() => { setSearch(''); setFilterStatus(''); setFilterDate(''); }}>✕ Clear</button>
-          )}
-        </div>
-        <p className="menu-count">{filtered.length} reservation{filtered.length !== 1 ? 's' : ''} found</p>
+      {/* Filters */}
+      <div className="menu-filters" style={{ marginBottom: '0.75rem' }}>
+        <input placeholder="🔍 Search by name, phone or email..." value={search} onChange={e => setSearch(e.target.value)} className="menu-search" />
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+          <option value="">All Status</option>
+          {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+        <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} style={{ width: 'auto' }} />
+        {(search || filterStatus || filterDate) && (
+          <button className="btn-secondary btn-sm" onClick={() => { setSearch(''); setFilterStatus(''); setFilterDate(''); }}>✕ Clear</button>
+        )}
+      </div>
+      <p className="menu-count">{filtered.length} reservation{filtered.length !== 1 ? 's' : ''} found</p>
+
+      {/* Mobile cards */}
+      <div className="rs-cards">
+        {filtered.length === 0 ? <p className="no-results">No reservations found.</p> : filtered.map(r => (
+          <div key={r.id} className="rs-card">
+            <div className="rs-card-header">
+              <div>
+                <strong>{r.customer_name}</strong>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginLeft: '0.5rem' }}>#{r.id}</span>
+              </div>
+              <span className={`badge badge-${r.status}`}>{r.status}</span>
+            </div>
+            <div className="rs-card-meta">
+              <span>📞 {r.customer_phone}</span>
+              <span>🪑 Table {r.table_number}</span>
+              <span>👥 Party of {r.party_size}</span>
+              <span>📅 {r.reservation_date?.split('T')[0]}</span>
+              <span>🕐 {r.reservation_time}</span>
+            </div>
+            {canManage && (
+              <div className="rs-card-actions">
+                <select value={r.status} onChange={e => updateStatus(r.id, e.target.value)} className="status-select">
+                  {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+                <button className="btn-secondary btn-sm" onClick={() => setEditReservation({ ...r, reservation_date: r.reservation_date?.split('T')[0] })}>✎ Edit</button>
+                <button className="btn-danger btn-sm" onClick={() => handleDelete(r.id)}>🗑</button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="rs-table-wrapper">
         <table className="data-table">
           <thead>
             <tr><th>ID</th><th>Customer</th><th>Phone</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th>{canManage && <th>Update</th>}{canManage && <th>Actions</th>}</tr>
@@ -138,7 +159,7 @@ const Reservations = () => {
                 {canManage && (
                   <td>
                     <select value={r.status} onChange={e => updateStatus(r.id, e.target.value)} className="status-select">
-                      {['pending', 'confirmed', 'cancelled', 'completed'].map(s => <option key={s} value={s}>{s}</option>)}
+                      {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </td>
                 )}
@@ -146,7 +167,7 @@ const Reservations = () => {
                   <td>
                     <div className="btn-group">
                       <button className="btn-secondary btn-sm" onClick={() => setEditReservation({ ...r, reservation_date: r.reservation_date?.split('T')[0] })}>Edit</button>
-                      <button className="btn-danger btn-sm" onClick={() => handleDelete(r.id)}>🗑 Delete</button>
+                      <button className="btn-danger btn-sm" onClick={() => handleDelete(r.id)}>🗑</button>
                     </div>
                   </td>
                 )}
@@ -155,6 +176,8 @@ const Reservations = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Edit Modal */}
       {editReservation && canManage && (
         <div className="modal-overlay" onClick={() => setEditReservation(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
@@ -172,7 +195,7 @@ const Reservations = () => {
               <input type="number" placeholder="Party Size" value={editReservation.party_size} onChange={e => setEditReservation({ ...editReservation, party_size: e.target.value })} required />
               <input placeholder="Special Requests" value={editReservation.special_requests || ''} onChange={e => setEditReservation({ ...editReservation, special_requests: e.target.value })} />
               <select value={editReservation.status} onChange={e => setEditReservation({ ...editReservation, status: e.target.value })}>
-                {['pending', 'confirmed', 'cancelled', 'completed'].map(s => <option key={s} value={s}>{s}</option>)}
+                {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
               <div className="form-buttons">
                 <button type="submit" className="btn-primary">Save Changes</button>

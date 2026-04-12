@@ -372,9 +372,8 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
   /* Menu grid */
   .menu-grid { grid-template-columns: repeat(2, 1fr); }
 
-  /* Data table - horizontal scroll */
-  .card { overflow-x: auto; padding: 1rem; }
-  .data-table { min-width: 600px; }
+  /* Data table - horizontal scroll on tablet */
+  .card { padding: 1rem; }
 
   /* Forms */
   .form-grid { grid-template-columns: 1fr; }
@@ -493,6 +492,41 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
 .delivery-step.active .delivery-step-dot { background: var(--primary); border-color: var(--primary); }
 .delivery-step span { font-size: 0.65rem; color: var(--text-muted); text-align: center; text-transform: capitalize; }
 .delivery-step.active span { color: var(--primary); font-weight: 600; }
+
+/* ===== RESERVATIONS, ORDERS, PAYMENTS — MOBILE FIRST ===== */
+
+/* Shared card pattern */
+.rs-cards, .ord-cards, .pay-cards { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+.rs-table-wrapper, .ord-table-wrapper, .pay-table-wrapper { display: none; }
+
+/* Reservation cards */
+.rs-card { background: var(--card-bg); border-radius: 12px; padding: 1rem; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+.rs-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.4rem; }
+.rs-card-meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.6rem; }
+.rs-card-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+
+/* Order cards */
+.ord-card { background: var(--card-bg); border-radius: 12px; padding: 1rem; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+.ord-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.4rem; }
+.ord-card-meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem; }
+.ord-card-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+
+/* Payment cards */
+.pay-card { background: var(--card-bg); border-radius: 12px; padding: 1rem; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+.pay-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.4rem; }
+.pay-card-amount { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.4rem; }
+.pay-card-meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.82rem; color: var(--text-muted); }
+
+/* Tablet: 2-column grid */
+@media (min-width: 600px) {
+  .rs-cards, .ord-cards, .pay-cards { display: grid; grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Desktop: hide cards, show table */
+@media (min-width: 960px) {
+  .rs-cards, .ord-cards, .pay-cards { display: none; }
+  .rs-table-wrapper, .ord-table-wrapper, .pay-table-wrapper { display: block; overflow-x: auto; }
+}
 
 /* ===== NOTIFICATIONS ===== */
 .notif-wrapper { position: relative; }

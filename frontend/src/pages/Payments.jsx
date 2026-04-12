@@ -33,37 +33,35 @@ const Payments = () => {
       toast.success('Payment processed!');
       setShowForm(false);
       setForm({ order_id: '', amount: '', payment_method: 'cash', transaction_id: '' });
-      window.history.replaceState(null, '', window.location.pathname);
       fetchAll();
     } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this payment?')) return;
-    try {
-      await api.delete(`/payments/${id}`);
-      toast.success('Payment deleted!');
-      fetchAll();
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed to delete'); }
+    try { await api.delete(`/payments/${id}`); toast.success('Deleted!'); fetchAll(); }
+    catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };
 
   const filtered = payments.filter(p => {
-    const matchSearch = p.order_id.toString().includes(search) ||
-      p.transaction_id?.toLowerCase().includes(search.toLowerCase());
-    const matchMethod = filterMethod ? p.payment_method === filterMethod : true;
-    const matchStatus = filterStatus ? p.payment_status === filterStatus : true;
-    return matchSearch && matchMethod && matchStatus;
+    const q = search.toLowerCase();
+    return (p.order_id.toString().includes(q) || p.transaction_id?.toLowerCase().includes(q)) &&
+      (filterMethod ? p.payment_method === filterMethod : true) &&
+      (filterStatus ? p.payment_status === filterStatus : true);
   });
 
   const totalRevenue = filtered.reduce((sum, p) => sum + parseFloat(p.amount), 0);
 
+  const methodIcon = { cash: '💵', card: '💳', online: '🌐' };
+
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">Payments</h1>
+        <h1 className="page-title">💳 Payments</h1>
         <button className="btn-primary" onClick={() => setShowForm(!showForm)}>+ Process Payment</button>
       </div>
 
+      {/* Revenue stat */}
       <div className="stat-card" style={{ borderLeft: '4px solid #059669', marginBottom: '1.5rem' }}>
         <div className="stat-icon">💰</div>
         <div>
@@ -78,7 +76,7 @@ const Payments = () => {
           <form onSubmit={handleCreate} className="form-grid">
             <select value={form.order_id} onChange={e => handleOrderSelect(e.target.value)} required>
               <option value="">Select Order</option>
-              {orders.map(o => <option key={o.id} value={o.id}>Order #{o.id} - Table {o.table_number} (RWF {parseFloat(o.total_amount).toFixed(0)})</option>)}
+              {orders.map(o => <option key={o.id} value={o.id}>Order #{o.id} — Table {o.table_number} (RWF {parseFloat(o.total_amount).toFixed(0)})</option>)}
             </select>
             <input type="number" step="0.01" placeholder="Amount" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} required />
             <select value={form.payment_method} onChange={e => setForm({ ...form, payment_method: e.target.value })}>
@@ -87,35 +85,64 @@ const Payments = () => {
               <option value="online">Online</option>
             </select>
             <input placeholder="Transaction ID (optional)" value={form.transaction_id} onChange={e => setForm({ ...form, transaction_id: e.target.value })} />
-            <button type="submit" className="btn-primary">Process Payment</button>
+            <div className="btn-group">
+              <button type="submit" className="btn-primary">Process</button>
+              <button type="button" className="btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
+            </div>
           </form>
         </div>
       )}
 
-      <div className="card">
-        <div className="menu-filters" style={{ marginBottom: '1rem' }}>
-          <input placeholder="🔍 Search by order ID or transaction ID..." value={search}
-            onChange={e => setSearch(e.target.value)} className="menu-search" />
-          <select value={filterMethod} onChange={e => setFilterMethod(e.target.value)}>
-            <option value="">All Methods</option>
-            <option value="cash">Cash</option>
-            <option value="card">Card</option>
-            <option value="online">Online</option>
-          </select>
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
-            <option value="">All Status</option>
-            <option value="completed">Completed</option>
-            <option value="pending">Pending</option>
-            <option value="failed">Failed</option>
-          </select>
-          {(search || filterMethod || filterStatus) && (
-            <button className="btn-secondary btn-sm" onClick={() => { setSearch(''); setFilterMethod(''); setFilterStatus(''); }}>✕ Clear</button>
-          )}
-        </div>
-        <p className="menu-count">{filtered.length} payment{filtered.length !== 1 ? 's' : ''} found</p>
+      {/* Filters */}
+      <div className="menu-filters" style={{ marginBottom: '0.75rem' }}>
+        <input placeholder="🔍 Search by order ID or transaction ID..." value={search} onChange={e => setSearch(e.target.value)} className="menu-search" />
+        <select value={filterMethod} onChange={e => setFilterMethod(e.target.value)}>
+          <option value="">All Methods</option>
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+          <option value="online">Online</option>
+        </select>
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+          <option value="">All Status</option>
+          <option value="completed">Completed</option>
+          <option value="pending">Pending</option>
+          <option value="failed">Failed</option>
+        </select>
+        {(search || filterMethod || filterStatus) && (
+          <button className="btn-secondary btn-sm" onClick={() => { setSearch(''); setFilterMethod(''); setFilterStatus(''); }}>✕ Clear</button>
+        )}
+      </div>
+      <p className="menu-count">{filtered.length} payment{filtered.length !== 1 ? 's' : ''} found</p>
+
+      {/* Mobile cards */}
+      <div className="pay-cards">
+        {filtered.length === 0 ? <p className="no-results">No payments found.</p> : filtered.map(p => (
+          <div key={p.id} className="pay-card">
+            <div className="pay-card-header">
+              <div>
+                <strong>Order #{p.order_id}</strong>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginLeft: '0.5rem' }}>#{p.id}</span>
+              </div>
+              <span className={`badge badge-${p.payment_status === 'completed' ? 'available' : 'occupied'}`}>{p.payment_status}</span>
+            </div>
+            <div className="pay-card-amount">RWF {parseFloat(p.amount).toFixed(0)}</div>
+            <div className="pay-card-meta">
+              <span>{methodIcon[p.payment_method]} {p.payment_method}</span>
+              {p.transaction_id && <span>🔖 {p.transaction_id}</span>}
+              <span>📅 {new Date(p.created_at).toLocaleDateString()}</span>
+            </div>
+            {user?.role === 'admin' && (
+              <button className="btn-danger btn-sm" style={{ marginTop: '0.5rem' }} onClick={() => handleDelete(p.id)}>🗑 Delete</button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="pay-table-wrapper">
         <table className="data-table">
           <thead>
-            <tr><th>ID</th><th>Order</th><th>Amount</th><th>Method</th><th>Status</th><th>Transaction ID</th><th>Date</th>{user?.role === 'admin' && <th>Action</th>}</tr>
+            <tr><th>ID</th><th>Order</th><th>Amount</th><th>Method</th><th>Status</th><th>Transaction</th><th>Date</th>{user?.role === 'admin' && <th>Action</th>}</tr>
           </thead>
           <tbody>
             {filtered.map(p => (
@@ -125,10 +152,10 @@ const Payments = () => {
                 <td>RWF {parseFloat(p.amount).toFixed(0)}</td>
                 <td><span className="badge badge-reserved">{p.payment_method}</span></td>
                 <td><span className={`badge badge-${p.payment_status === 'completed' ? 'available' : 'occupied'}`}>{p.payment_status}</span></td>
-                <td>{p.transaction_id || '-'}</td>
+                <td>{p.transaction_id || '—'}</td>
                 <td>{new Date(p.created_at).toLocaleDateString()}</td>
                 {user?.role === 'admin' && (
-                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(p.id)}>🗑 Delete</button></td>
+                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(p.id)}>🗑</button></td>
                 )}
               </tr>
             ))}
