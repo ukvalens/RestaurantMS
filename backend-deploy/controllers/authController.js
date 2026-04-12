@@ -47,15 +47,44 @@ exports.login = async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
     
-    const result = await pool.query('SELECT * FROM users WHERE LOWER(email) = $1', [normalizedEmail]);
-    if (result.rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
+    const result = await pool.query('SELECT id, username, email, password, role, avatar_url, reset_pending FROM users WHERE LOWER(email) = $1', [normalizedEmail]);
+    if (result.rows.length === 0) {
+      console.log('[Login] User not found for email:', normalizedEmail);
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    
     const user = result.rows[0];
-    if (user.reset_pending) return res.status(403).json({ error: 'Password reset is pending. Please check your email to reset your password before logging in.' });
+    console.log('[Login] User found:', user.username, '| Reset pending:', user.reset_pending);
+    
+    if (user.reset_pending) {
+      return res.status(403).json({ error: 'Password reset is pending. Please check your email to reset your password before logging in.' });
+    }
+    
     const validPassword = await bcrypt.compare(normalizedPassword, user.password);
-    if (!validPassword) return res.status(401).json({ error: 'Invalid credentials' });
+    console.log('[Login] Password match:', validPassword);
+    
+    if (!validPassword) {
+      console.log('[Login] Invalid password for user:', user.username);
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role, avatar_url: user.avatar_url } });
+    const responseUser = { 
+      id: user.id, 
+      username: user.username, 
+      email: user.email, 
+      role: user.role
+    };
+    
+    // Only include avatar_url if it exists
+    if (user.avatar_url) {
+      responseUser.avatar_url = user.avatar_url;
+    }
+    
+    console.log('[Login] Success for user:', user.username);
+    res.json({ token, user: responseUser });
   } catch (error) {
+    console.error('[Login] Error:', error.message, error.stack);
     res.status(500).json({ error: error.message });
   }
 };
