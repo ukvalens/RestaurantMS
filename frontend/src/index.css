@@ -18,7 +18,13 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--
 .layout { display: flex; min-height: 100vh; }
 .main-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
-.app-footer { background: var(--sidebar-bg); color: rgba(255,255,255,0.4); text-align: center; padding: 0.85rem; font-size: 0.82rem; }
+.app-footer { background: var(--sidebar-bg); color: rgba(255,255,255,0.6); padding: 1rem 1.5rem; font-size: 0.82rem; width: 100%; box-sizing: border-box; }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+.footer-brand { color: rgba(255,255,255,0.8); font-size: 0.85rem; }
+.footer-contact { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+.footer-contact span { display: flex; align-items: center; gap: 0.3rem; }
+.footer-contact a { color: rgba(255,255,255,0.7); text-decoration: none; }
+.footer-contact a:hover { color: #fff; text-decoration: underline; }
 
 /* Topbar */
 .topbar { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 2rem; background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
