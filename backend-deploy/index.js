@@ -26,17 +26,19 @@ app.get('/', (req, res) => res.json({ message: 'Restaurant Management System API
 app.get('/health', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
-    res.json({ 
-      status: 'healthy', 
-      timestamp: result.rows[0].now,
-      database: 'connected'
-    });
+    res.json({ status: 'healthy', timestamp: result.rows[0].now, database: 'connected' });
   } catch (error) {
-    res.status(500).json({ 
-      status: 'unhealthy', 
-      database: 'disconnected',
-      error: error.message 
-    });
+    res.status(500).json({ status: 'unhealthy', database: 'disconnected', error: error.message });
+  }
+});
+
+// Also expose health under /api prefix
+app.get('/api/health', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.json({ status: 'healthy', timestamp: result.rows[0].now, database: 'connected' });
+  } catch (error) {
+    res.status(500).json({ status: 'unhealthy', database: 'disconnected', error: error.message });
   }
 });
 
