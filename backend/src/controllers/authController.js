@@ -5,34 +5,60 @@ const pool = require('../config/database');
 
 exports.register = async (req, res) => {
   const { username, email, password, role } = req.body;
+  console.log('[Register] Request:', { username, email, role });
+  
   try {
     const normalizedEmail = email?.trim().toLowerCase();
     const normalizedPassword = password?.trim();
     const normalizedUsername = username?.trim();
     
     if (!normalizedEmail || !normalizedPassword || !normalizedUsername || !role) {
+      console.log('[Register] Missing required fields');
       return res.status(400).json({ error: 'All fields are required' });
     }
     
     if (!normalizedEmail.includes('@')) {
+      console.log('[Register] Invalid email format:', normalizedEmail);
       return res.status(400).json({ error: 'Invalid email format' });
     }
     
     if (normalizedPassword.length < 6) {
+      console.log('[Register] Password too short');
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
     
+    // Validate role
+    const validRoles = ['admin', 'manager', 'waiter', 'chef', 'customer'];
+    if (!validRoles.includes(role)) {
+      console.log('[Register] Invalid role:', role);
+      return res.status(400).json({ error: 'Invalid role. Must be: admin, manager, waiter, chef, or customer' });
+    }
+    
+    console.log('[Register] Hashing password...');
     const hashedPassword = await bcrypt.hash(normalizedPassword, 10);
+    
+    console.log('[Register] Inserting into database:', { username: normalizedUsername, email: normalizedEmail, role });
     const result = await pool.query(
       'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, username, email, role',
       [normalizedUsername, normalizedEmail, hashedPassword, role]
     );
+    
+    console.log('[Register] Success! Created user:', result.rows[0]);
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    if (error.message.includes('duplicate key')) {
+    console.error('[Register] Error:', error.message, error.code, error.detail);
+    
+    if (error.code === '23505' || error.message.includes('duplicate key')) {
+      console.log('[Register] Duplicate email error');
       res.status(409).json({ error: 'Email already registered' });
+    } else if (error.code === '23502') {
+      console.log('[Register] Not null constraint violation');
+      res.status(400).json({ error: 'Missing required database fields' });
+    } else if (error.code === '23514') {
+      console.log('[Register] Check constraint violation - invalid role probably');
+      res.status(400).json({ error: 'Invalid role value' });
     } else {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message, code: error.code });
     }
   }
 };
