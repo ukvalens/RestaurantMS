@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
@@ -11,12 +11,23 @@ const Home = () => {
   const [page, setPage] = useState(0);
 
   useEffect(() => {
-    api.get('/menu/items').then(r => setMenuItems(r.data.filter(i => i.is_available))).catch(() => {});
+    api.get('/menu/items/public').then(r => setMenuItems(r.data)).catch(() => {});
   }, []);
 
   const totalPages = Math.ceil(menuItems.length / PAGE_SIZE);
   const pageItems = menuItems.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
   const dashLink = user?.role === 'customer' ? '/customer/dashboard' : '/app/dashboard';
+
+  // Auto-slide every 5 seconds
+  const nextPage = useCallback(() => {
+    setPage(p => (p + 1) % Math.max(1, totalPages));
+  }, [totalPages]);
+
+  useEffect(() => {
+    if (totalPages <= 1) return;
+    const timer = setInterval(nextPage, 5000);
+    return () => clearInterval(timer);
+  }, [nextPage, totalPages]);
 
   return (
     <div className="home">

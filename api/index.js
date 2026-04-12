@@ -240,6 +240,13 @@ r.post('/auth/reset-user-password', authMiddleware, roleCheck('admin'), async (r
 });
 
 // ── MENU ──────────────────────────────────────────────────────────────────────
+r.get('/menu/items/public', async (req, res) => {
+  try {
+    const r = await pool.query('SELECT mi.*,mc.name as category_name FROM menu_items mi LEFT JOIN menu_categories mc ON mi.category_id=mc.id WHERE mi.is_available=true ORDER BY mc.name,mi.name');
+    res.json(r.rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 r.get('/menu/categories', authMiddleware, async (req, res) => {
   try { res.json((await pool.query('SELECT * FROM menu_categories ORDER BY name')).rows); }
   catch (e) { res.status(500).json({ error: e.message }); }
