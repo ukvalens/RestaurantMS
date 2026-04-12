@@ -10,6 +10,8 @@ const Users = () => {
   const [formData, setFormData] = useState({ username: '', email: '', password: '', role: 'waiter' });
   const [resetPasswordUser, setResetPasswordUser] = useState(null);
   const [resetPasswordValue, setResetPasswordValue] = useState('');
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 5;
 
   useEffect(() => {
     fetchUsers();
@@ -192,7 +194,7 @@ const Users = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {users.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((user) => (
             <tr key={user.id}>
               <td>{user.id}</td>
               <td>{user.username}</td>
@@ -214,6 +216,12 @@ const Users = () => {
           ))}
         </tbody>
       </table>
+
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', alignItems: 'center' }}>
+        <button className="btn btn-secondary" onClick={() => setPage(p => p - 1)} disabled={page === 1}>← Prev</button>
+        <span>Page {page} of {Math.ceil(users.length / PAGE_SIZE)}</span>
+        <button className="btn btn-secondary" onClick={() => setPage(p => p + 1)} disabled={page >= Math.ceil(users.length / PAGE_SIZE)}>Next →</button>
+      </div>
     </div>
   );
 };
