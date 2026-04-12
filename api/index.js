@@ -306,6 +306,13 @@ r.put('/tables/:id', authMiddleware, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+r.delete('/tables/:id', authMiddleware, roleCheck('admin'), async (req, res) => {
+  try {
+    await pool.query('DELETE FROM tables WHERE id=$1', [req.params.id]);
+    res.json({ message: 'Table deleted' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ── ORDERS ────────────────────────────────────────────────────────────────────
 r.get('/orders', authMiddleware, async (req, res) => {
   try {
@@ -349,6 +356,14 @@ r.put('/orders/:id', authMiddleware, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+r.delete('/orders/:id', authMiddleware, roleCheck('admin'), async (req, res) => {
+  try {
+    await pool.query('DELETE FROM order_items WHERE order_id=$1', [req.params.id]);
+    await pool.query('DELETE FROM orders WHERE id=$1', [req.params.id]);
+    res.json({ message: 'Order deleted' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ── RESERVATIONS ──────────────────────────────────────────────────────────────
 r.get('/reservations', authMiddleware, async (req, res) => {
   try {
@@ -376,6 +391,13 @@ r.put('/reservations/:id', authMiddleware, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+r.delete('/reservations/:id', authMiddleware, roleCheck('admin'), async (req, res) => {
+  try {
+    await pool.query('DELETE FROM reservations WHERE id=$1', [req.params.id]);
+    res.json({ message: 'Reservation deleted' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ── PAYMENTS ──────────────────────────────────────────────────────────────────
 r.get('/payments', authMiddleware, roleCheck('admin', 'manager'), async (req, res) => {
   try {
@@ -397,6 +419,13 @@ r.post('/payments', authMiddleware, async (req, res) => {
     res.status(201).json(r);
   } catch (e) { await client.query('ROLLBACK'); res.status(500).json({ error: e.message }); }
   finally { client.release(); }
+});
+
+r.delete('/payments/:id', authMiddleware, roleCheck('admin'), async (req, res) => {
+  try {
+    await pool.query('DELETE FROM payments WHERE id=$1', [req.params.id]);
+    res.json({ message: 'Payment deleted' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ── ANNOUNCEMENTS ─────────────────────────────────────────────────────────────

@@ -39,10 +39,19 @@ const Reservations = () => {
 
   const updateStatus = async (id, status) => {
     try {
-      await api.put(`/reservations/${id}/status`, { status });
+      await api.put(`/reservations/${id}`, { status });
       toast.success('Status updated!');
       fetchAll();
     } catch { toast.error('Failed'); }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this reservation?')) return;
+    try {
+      await api.delete(`/reservations/${id}`);
+      toast.success('Reservation deleted!');
+      fetchAll();
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to delete'); }
   };
 
   const filtered = reservations.filter(r => {
@@ -97,7 +106,7 @@ const Reservations = () => {
         <p className="menu-count">{filtered.length} reservation{filtered.length !== 1 ? 's' : ''} found</p>
         <table className="data-table">
           <thead>
-            <tr><th>ID</th><th>Customer</th><th>Phone</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th>{canManage && <th>Action</th>}</tr>
+            <tr><th>ID</th><th>Customer</th><th>Phone</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th>{canManage && <th>Update</th>}{user?.role === 'admin' && <th>Action</th>}</tr>
           </thead>
           <tbody>
             {filtered.map(r => (
@@ -116,6 +125,9 @@ const Reservations = () => {
                       {['pending', 'confirmed', 'cancelled', 'completed'].map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </td>
+                )}
+                {user?.role === 'admin' && (
+                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(r.id)}>🗑 Delete</button></td>
                 )}
               </tr>
             ))}

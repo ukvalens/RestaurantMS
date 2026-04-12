@@ -54,10 +54,19 @@ const Orders = () => {
 
   const updateStatus = async (id, status) => {
     try {
-      await api.put(`/orders/${id}/status`, { status });
+      await api.put(`/orders/${id}`, { status });
       toast.success('Status updated!');
       fetchOrders();
     } catch { toast.error('Failed'); }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this order?')) return;
+    try {
+      await api.delete(`/orders/${id}`);
+      toast.success('Order deleted!');
+      fetchOrders();
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to delete'); }
   };
 
   const statuses = ['pending', 'preparing', 'ready', 'served', 'completed', 'cancelled'];
@@ -124,7 +133,7 @@ const Orders = () => {
         <p className="menu-count">{filtered.length} order{filtered.length !== 1 ? 's' : ''} found</p>
         <table className="data-table">
           <thead>
-            <tr><th>ID</th><th>Table</th><th>Waiter</th><th>Amount</th><th>Status</th><th>Update Status</th></tr>
+            <tr><th>ID</th><th>Table</th><th>Waiter</th><th>Amount</th><th>Status</th><th>Update Status</th>{user?.role === 'admin' && <th>Action</th>}</tr>
           </thead>
           <tbody>
             {filtered.map(o => (
@@ -139,6 +148,9 @@ const Orders = () => {
                     {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </td>
+                {user?.role === 'admin' && (
+                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(o.id)}>🗑 Delete</button></td>
+                )}
               </tr>
             ))}
           </tbody>

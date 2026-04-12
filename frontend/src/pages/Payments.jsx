@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 
 const Payments = () => {
   const [payments, setPayments] = useState([]);
@@ -10,6 +11,7 @@ const Payments = () => {
   const [filterMethod, setFilterMethod] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [form, setForm] = useState({ order_id: '', amount: '', payment_method: 'cash', transaction_id: '' });
+  const { user } = useAuth();
 
   const fetchAll = async () => {
     const [pays, ords] = await Promise.all([api.get('/payments'), api.get('/orders')]);
@@ -33,6 +35,15 @@ const Payments = () => {
       setForm({ order_id: '', amount: '', payment_method: 'cash', transaction_id: '' });
       fetchAll();
     } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this payment?')) return;
+    try {
+      await api.delete(`/payments/${id}`);
+      toast.success('Payment deleted!');
+      fetchAll();
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to delete'); }
   };
 
   const filtered = payments.filter(p => {
@@ -103,7 +114,7 @@ const Payments = () => {
         <p className="menu-count">{filtered.length} payment{filtered.length !== 1 ? 's' : ''} found</p>
         <table className="data-table">
           <thead>
-            <tr><th>ID</th><th>Order</th><th>Amount</th><th>Method</th><th>Status</th><th>Transaction ID</th><th>Date</th></tr>
+            <tr><th>ID</th><th>Order</th><th>Amount</th><th>Method</th><th>Status</th><th>Transaction ID</th><th>Date</th>{user?.role === 'admin' && <th>Action</th>}</tr>
           </thead>
           <tbody>
             {filtered.map(p => (
@@ -115,6 +126,9 @@ const Payments = () => {
                 <td><span className={`badge badge-${p.payment_status === 'completed' ? 'available' : 'occupied'}`}>{p.payment_status}</span></td>
                 <td>{p.transaction_id || '-'}</td>
                 <td>{new Date(p.created_at).toLocaleDateString()}</td>
+                {user?.role === 'admin' && (
+                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(p.id)}>🗑 Delete</button></td>
+                )}
               </tr>
             ))}
           </tbody>

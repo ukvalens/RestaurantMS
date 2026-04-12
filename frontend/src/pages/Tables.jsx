@@ -32,10 +32,19 @@ const Tables = () => {
 
   const updateStatus = async (id, status) => {
     try {
-      await api.put(`/tables/${id}/status`, { status });
+      await api.put(`/tables/${id}`, { status });
       toast.success('Status updated!');
       fetchTables();
     } catch { toast.error('Failed to update status'); }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this table?')) return;
+    try {
+      await api.delete(`/tables/${id}`);
+      toast.success('Table deleted!');
+      fetchTables();
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to delete'); }
   };
 
   const statusColor = { available: '#059669', occupied: '#dc2626', reserved: '#d97706' };
@@ -81,7 +90,7 @@ const Tables = () => {
       </div>
       <p className="menu-count">{filtered.length} table{filtered.length !== 1 ? 's' : ''} found</p>
 
-      <div className="tables-grid">
+          <div className="tables-grid">
         {filtered.map(t => (
           <div key={t.id} className="table-card" style={{ borderTop: `4px solid ${statusColor[t.status]}` }}>
             <h3>Table {t.table_number}</h3>
@@ -93,6 +102,9 @@ const Tables = () => {
                 <option value="occupied">Occupied</option>
                 <option value="reserved">Reserved</option>
               </select>
+            )}
+            {user?.role === 'admin' && (
+              <button className="btn-danger btn-sm" style={{ marginTop: '0.5rem', width: '100%' }} onClick={() => handleDelete(t.id)}>🗑 Delete</button>
             )}
           </div>
         ))}
