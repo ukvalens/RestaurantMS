@@ -22,7 +22,7 @@ const Tables = () => {
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/tables', { table_number: +form.table_number, capacity: +form.capacity });
+      await api.post('/tables', { table_number: form.table_number, capacity: +form.capacity });
       toast.success('Table created!');
       setForm({ table_number: '', capacity: '' });
       setShowForm(false);
@@ -66,7 +66,7 @@ const Tables = () => {
         <div className="card">
           <h2>New Table</h2>
           <form onSubmit={handleCreate} className="form-grid">
-            <input type="number" placeholder="Table Number" value={form.table_number}
+            <input type="text" placeholder="Table Number (e.g. T1, A2, VIP-1)" value={form.table_number}
               onChange={e => setForm({ ...form, table_number: e.target.value })} required />
             <input type="number" placeholder="Capacity" value={form.capacity}
               onChange={e => setForm({ ...form, capacity: e.target.value })} required />
