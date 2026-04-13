@@ -4,7 +4,7 @@ import { useNotifications } from '../context/NotificationContext';
 
 const typeIcon = {
   new_order: '🛒', reservation: '📅', low_stock: '⚠️',
-  delivery: '🚚', announcement: '📢', default: '🔔',
+  delivery: '🚚', announcement: '📢', new_user: '👤', default: '🔔',
 };
 
 const timeAgo = (date) => {

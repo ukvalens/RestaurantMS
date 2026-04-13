@@ -22,7 +22,7 @@ export const NotificationProvider = ({ children }) => {
   useEffect(() => {
     if (!token) { setNotifications([]); setUnreadCount(0); return; }
     fetchNotifications();
-    intervalRef.current = setInterval(fetchNotifications, 30000);
+    intervalRef.current = setInterval(fetchNotifications, 10000);
     return () => clearInterval(intervalRef.current);
   }, [token, fetchNotifications]);
 

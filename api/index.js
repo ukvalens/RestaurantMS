@@ -105,6 +105,7 @@ r.post('/auth/register', async (req, res) => {
       [normalizedUsername, normalizedEmail, hashed, role]
     );
     res.status(201).json(r.rows[0]);
+    createNotification('new_user', '👤 New User Registered', `${normalizedUsername} (${normalizedEmail}) just created a ${role} account. Review their role and permissions.`, 'admin', '/app/users');
   } catch (e) { 
     if (e.message.includes('duplicate key')) {
       res.status(409).json({ error: 'Email already registered' });
@@ -564,10 +565,10 @@ const ensureNotificationsTable = () => pool.query(`
 const createNotification = async (type, title, message, role_target = 'all', link = null) => {
   try {
     await ensureNotificationsTable();
-    // Get all users matching the role target
-    const roleFilter = role_target === 'all'
-      ? `WHERE role IN ('admin','manager','waiter','delivery','customer')`
-      : `WHERE role = '${role_target}' OR role = 'admin' OR role = 'manager'`;
+    const roleFilter =
+      role_target === 'all'  ? `WHERE role IN ('admin','manager','waiter','delivery','customer')` :
+      role_target === 'admin' ? `WHERE role = 'admin'` :
+      `WHERE role = '${role_target}' OR role = 'admin' OR role = 'manager'`;
     const users = await pool.query(`SELECT id FROM users ${roleFilter}`);
     for (const u of users.rows) {
       await pool.query(
