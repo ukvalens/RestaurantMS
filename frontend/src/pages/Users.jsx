@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from '../api/axios';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 
 const ROLES = ['customer', 'waiter', 'delivery', 'manager', 'admin'];
 
@@ -21,6 +22,7 @@ const STAFF_PERMS = ['dashboard','tables','menu','orders','reservations','paymen
 const CUSTOMER_PERMS = ['dashboard','menu','reserve','my-reservations','my-orders','my-deliveries','announcements'];
 
 const Users = () => {
+  const { refreshPermissions } = useAuth();
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,6 +74,7 @@ const Users = () => {
     setPermSaving(true);
     try {
       await axios.put('/auth/permissions', { role: permRole, permissions: permissions[permRole] || [] });
+      await refreshPermissions();
       toast.success(`Permissions updated for ${permRole}`);
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to save');

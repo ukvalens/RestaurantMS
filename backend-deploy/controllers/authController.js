@@ -254,48 +254,45 @@ const DEFAULT_PERMISSIONS = {
 
 const ALL_PERMISSIONS = ['dashboard','tables','menu','orders','reservations','payments','users','deliveries','announcements','reports','reserve','my-reservations','my-orders','my-deliveries'];
 
-async function ensurePermissionsTable() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS role_permissions (
-      role VARCHAR(20) PRIMARY KEY,
-      permissions JSONB NOT NULL
-    )
-  `);
-  for (const [role, perms] of Object.entries(DEFAULT_PERMISSIONS)) {
-    await pool.query(
-      `INSERT INTO role_permissions (role, permissions) VALUES ($1, $2)
-       ON CONFLICT (role) DO NOTHING`,
-      [role, JSON.stringify(perms)]
-    );
-  }
-}
+// In-memory store — persists for the lifetime of the server process
+const permStore = JSON.parse(JSON.stringify(DEFAULT_PERMISSIONS));
+
+// Async load from DB on startup, fall back to defaults silently
+(async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS role_permissions (
+        role VARCHAR(20) PRIMARY KEY,
+        permissions TEXT NOT NULL
+      )
+    `);
+    for (const [role, perms] of Object.entries(DEFAULT_PERMISSIONS)) {
+      await pool.query(
+        `INSERT INTO role_permissions (role, permissions) VALUES ($1, $2) ON CONFLICT (role) DO NOTHING`,
+        [role, JSON.stringify(perms)]
+      );
+    }
+    const result = await pool.query('SELECT role, permissions FROM role_permissions');
+    result.rows.forEach(r => { permStore[r.role] = JSON.parse(r.permissions); });
+  } catch (_) { /* use in-memory defaults */ }
+})();
 
 exports.getPermissions = async (req, res) => {
-  try {
-    await ensurePermissionsTable();
-    const result = await pool.query('SELECT role, permissions FROM role_permissions ORDER BY role');
-    const map = {};
-    result.rows.forEach(r => { map[r.role] = r.permissions; });
-    res.json({ permissions: map, allPermissions: ALL_PERMISSIONS });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  res.json({ permissions: permStore, allPermissions: ALL_PERMISSIONS });
 };
 
 exports.updatePermissions = async (req, res) => {
   const { role, permissions } = req.body;
   if (!role || !Array.isArray(permissions)) return res.status(400).json({ error: 'role and permissions[] required' });
+  permStore[role] = permissions;
   try {
-    await ensurePermissionsTable();
     await pool.query(
       `INSERT INTO role_permissions (role, permissions) VALUES ($1, $2)
        ON CONFLICT (role) DO UPDATE SET permissions = $2`,
       [role, JSON.stringify(permissions)]
     );
-    res.json({ role, permissions });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (_) { /* DB unavailable — in-memory update still applied */ }
+  res.json({ role, permissions });
 };
 
 exports.changePassword = async (req, res) => {

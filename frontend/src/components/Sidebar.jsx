@@ -2,18 +2,19 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
-  { to: '/app/dashboard', label: '📊 Dashboard', roles: ['admin', 'manager', 'waiter', 'delivery'] },
-  { to: '/app/tables', label: '🪑 Tables', roles: ['admin', 'manager', 'waiter'] },
-  { to: '/app/menu', label: '🍽️ Menu', roles: ['admin', 'manager', 'waiter'] },
-  { to: '/app/orders', label: '📋 Orders', roles: ['admin', 'manager', 'waiter'] },
-  { to: '/app/deliveries', label: '🚚 Deliveries', roles: ['admin', 'manager', 'waiter', 'delivery'] },
-  { to: '/app/reservations', label: '📅 Reservations', roles: ['admin', 'manager', 'waiter'] },
-  { to: '/app/payments', label: '💳 Payments', roles: ['admin', 'manager'] },
-  { to: '/app/users', label: '👥 User Management', roles: ['admin'] },
+  { to: '/app/dashboard',    label: '📊 Dashboard',      perm: 'dashboard' },
+  { to: '/app/tables',       label: '🪑 Tables',          perm: 'tables' },
+  { to: '/app/menu',         label: '🍽️ Menu',            perm: 'menu' },
+  { to: '/app/orders',       label: '📋 Orders',          perm: 'orders' },
+  { to: '/app/deliveries',   label: '🚚 Deliveries',      perm: 'deliveries' },
+  { to: '/app/reservations', label: '📅 Reservations',    perm: 'reservations' },
+  { to: '/app/payments',     label: '💳 Payments',        perm: 'payments' },
+  { to: '/app/announcements',label: '📢 Announcements',   perm: 'announcements' },
+  { to: '/app/users',        label: '👥 User Management', perm: 'users' },
 ];
 
 const Sidebar = ({ onClose }) => {
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
 
   return (
     <aside className="sidebar">
@@ -26,7 +27,7 @@ const Sidebar = ({ onClose }) => {
       </div>
       <nav>
         {navItems
-          .filter(item => item.roles.includes(user?.role))
+          .filter(item => hasPermission(item.perm))
           .map(item => (
             <NavLink key={item.to} to={item.to} onClick={onClose}
               className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>

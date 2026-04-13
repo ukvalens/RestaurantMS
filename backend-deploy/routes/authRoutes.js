@@ -18,7 +18,7 @@ router.post('/users', authMiddleware, roleCheck('admin'), authController.createU
 router.put('/users/:id', authMiddleware, roleCheck('admin'), authController.updateUser);
 router.delete('/users/:id', authMiddleware, roleCheck('admin'), authController.deleteUser);
 router.post('/reset-user-password', authMiddleware, roleCheck('admin'), authController.resetUserPassword);
-router.get('/permissions', authMiddleware, roleCheck('admin'), authController.getPermissions);
+router.get('/permissions', authController.getPermissions);
 router.put('/permissions', authMiddleware, roleCheck('admin'), authController.updatePermissions);
 
 module.exports = router;
