@@ -3,7 +3,7 @@ const AppFooter = () => (
     <div className="footer-inner">
       <div className="footer-brand">
         <i className="fa-solid fa-utensils" style={{ marginRight: '0.4rem' }} />
-        <strong>RestaurantMS</strong> © 2026
+        <strong>RestaurantMS</strong> © {new Date().getFullYear()}
       </div>
       <div className="footer-contact">
         <span><i className="fa-solid fa-user" style={{ marginRight: '0.3rem' }} />Ukwitegetse Valens</span>
