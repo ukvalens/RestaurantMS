@@ -333,6 +333,17 @@ r.delete('/menu/items/:id', authMiddleware, roleCheck('admin', 'manager'), async
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+r.patch('/menu/items/:id/availability', authMiddleware, roleCheck('admin', 'manager'), async (req, res) => {
+  try {
+    const r = await pool.query(
+      'UPDATE menu_items SET is_available = NOT is_available WHERE id=$1 RETURNING *',
+      [req.params.id]
+    );
+    if (!r.rows.length) return res.status(404).json({ error: 'Item not found' });
+    res.json(r.rows[0]);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 r.post('/menu/items/:id/image', authMiddleware, roleCheck('admin', 'manager'), upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
