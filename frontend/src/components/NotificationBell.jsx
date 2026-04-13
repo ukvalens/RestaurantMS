@@ -3,8 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../context/NotificationContext';
 
 const typeIcon = {
-  new_order: '🛒', reservation: '📅', low_stock: '⚠️',
-  delivery: '🚚', announcement: '📢', new_user: '👤', default: '🔔',
+  new_order:    'fa-cart-shopping',
+  reservation:  'fa-calendar-check',
+  low_stock:    'fa-triangle-exclamation',
+  delivery:     'fa-truck',
+  announcement: 'fa-bullhorn',
+  new_user:     'fa-user-plus',
+  default:      'fa-bell',
 };
 
 const timeAgo = (date) => {
@@ -35,7 +40,7 @@ const NotificationBell = () => {
   return (
     <div className="notif-wrapper" ref={ref}>
       <button className="notif-bell-btn" onClick={() => setOpen(o => !o)} aria-label="Notifications">
-        🔔
+        <i className="fa-solid fa-bell" />
         {unreadCount > 0 && (
           <span className="notif-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
         )}
@@ -44,7 +49,7 @@ const NotificationBell = () => {
       {open && (
         <div className="notif-dropdown">
           <div className="notif-header">
-            <span className="notif-title">🔔 Notifications</span>
+            <span className="notif-title"><i className="fa-solid fa-bell" style={{ marginRight: '0.4rem' }} />Notifications</span>
             {unreadCount > 0 && (
               <button className="notif-mark-all" onClick={markAllRead}>Mark all read</button>
             )}
@@ -53,14 +58,14 @@ const NotificationBell = () => {
           <div className="notif-list">
             {notifications.length === 0 ? (
               <div className="notif-empty">
-                <span>🎉</span>
+                <i className="fa-solid fa-circle-check" style={{ fontSize: '2rem', color: '#059669' }} />
                 <p>You're all caught up!</p>
               </div>
             ) : notifications.map(n => (
               <div key={n.id} className={`notif-item ${!n.is_read ? 'unread' : ''}`}
                 onClick={() => handleClick(n)}>
                 <div className="notif-item-icon">
-                  {typeIcon[n.type] || typeIcon.default}
+                  <i className={`fa-solid ${typeIcon[n.type] || typeIcon.default}`} />
                 </div>
                 <div className="notif-item-body">
                   <p className="notif-item-title">{n.title}</p>
@@ -69,7 +74,7 @@ const NotificationBell = () => {
                 </div>
                 <button className="notif-item-del"
                   onClick={e => { e.stopPropagation(); deleteNotification(n.id); }}
-                  aria-label="Dismiss">✕</button>
+                  aria-label="Dismiss"><i className="fa-solid fa-xmark" /></button>
               </div>
             ))}
           </div>

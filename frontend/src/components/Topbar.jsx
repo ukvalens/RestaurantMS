@@ -17,11 +17,18 @@ const Topbar = ({ onMenuClick }) => {
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
+  const greeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return <><i className="fa-solid fa-sun" style={{ color: '#f59e0b' }} /> Good Morning</>;
+    if (h < 17) return <><i className="fa-solid fa-cloud-sun" style={{ color: '#f97316' }} /> Good Afternoon</>;
+    return <><i className="fa-solid fa-moon" style={{ color: '#6366f1' }} /> Good Evening</>;
+  };
+
   return (
     <header className="topbar">
       <div className="topbar-left">
-        <button className="hamburger-btn" onClick={onMenuClick}>☰</button>
-        <span className="topbar-greeting">{(() => { const h = new Date().getHours(); return h < 12 ? '🌅 Good Morning' : h < 17 ? '☀️ Good Afternoon' : '🌙 Good Evening'; })()}, {user?.username}!</span>
+        <button className="hamburger-btn" onClick={onMenuClick}><i className="fa-solid fa-bars" /></button>
+        <span className="topbar-greeting">{greeting()}, {user?.username}!</span>
       </div>
       <div className="topbar-right" ref={ref}>
         <NotificationBell />
@@ -34,7 +41,7 @@ const Topbar = ({ onMenuClick }) => {
             <span className="avatar-name">{user?.username}</span>
             <span className="avatar-role">{user?.role}</span>
           </div>
-          <span className="avatar-chevron">{open ? '▲' : '▼'}</span>
+          <span className="avatar-chevron"><i className={`fa-solid fa-chevron-${open ? 'up' : 'down'}`} /></span>
         </button>
         {open && (
           <div className="profile-dropdown">
@@ -50,10 +57,16 @@ const Topbar = ({ onMenuClick }) => {
               </div>
             </div>
             <hr className="dropdown-divider" />
-            <Link to="/app/profile" className="dropdown-item" onClick={() => setOpen(false)}>👤 My Profile</Link>
-            <Link to="/app/change-password" className="dropdown-item" onClick={() => setOpen(false)}>🔒 Change Password</Link>
+            <Link to="/app/profile" className="dropdown-item" onClick={() => setOpen(false)}>
+              <i className="fa-solid fa-user" style={{ width: '1rem', marginRight: '0.5rem' }} />My Profile
+            </Link>
+            <Link to="/app/change-password" className="dropdown-item" onClick={() => setOpen(false)}>
+              <i className="fa-solid fa-lock" style={{ width: '1rem', marginRight: '0.5rem' }} />Change Password
+            </Link>
             <hr className="dropdown-divider" />
-            <button className="dropdown-item dropdown-logout" onClick={handleLogout}>🚪 Logout</button>
+            <button className="dropdown-item dropdown-logout" onClick={handleLogout}>
+              <i className="fa-solid fa-right-from-bracket" style={{ width: '1rem', marginRight: '0.5rem' }} />Logout
+            </button>
           </div>
         )}
       </div>
