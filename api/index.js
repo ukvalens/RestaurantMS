@@ -641,7 +641,9 @@ r.post('/announcements', authMiddleware, roleCheck('admin', 'manager'), async (r
   try {
     await ensureAnnouncementsTable();
     if (!title || !message) return res.status(400).json({ error: 'Title and message are required' });
-    const result = await pool.query('INSERT INTO announcements (title,message,priority,created_by,created_by_name) VALUES ($1,$2,$3,$4,$5) RETURNING *', [title, message, priority, req.user.id, req.user.username]);
+    const userRow = await pool.query('SELECT username FROM users WHERE id=$1', [req.user.id]);
+    const username = userRow.rows[0]?.username || 'Unknown';
+    const result = await pool.query('INSERT INTO announcements (title,message,priority,created_by,created_by_name) VALUES ($1,$2,$3,$4,$5) RETURNING *', [title, message, priority, req.user.id, username]);
     res.status(201).json(result.rows[0]);
     const icon = priority === 'urgent' ? '🔴' : priority === 'info' ? '🔵' : '📢';
     createNotification('announcement', `${icon} ${title}`, message, 'all', '/app/announcements');
@@ -676,9 +678,11 @@ r.post('/announcements/:id/replies', authMiddleware, async (req, res) => {
   if (!message?.trim()) return res.status(400).json({ error: 'Message is required' });
   try {
     await ensureRepliesTable();
+    const userRow = await pool.query('SELECT username FROM users WHERE id=$1', [req.user.id]);
+    const username = userRow.rows[0]?.username || 'Unknown';
     const result = await pool.query(
       'INSERT INTO announcement_replies (announcement_id, user_id, username, message) VALUES ($1,$2,$3,$4) RETURNING *',
-      [req.params.id, req.user.id, req.user.username, message.trim()]
+      [req.params.id, req.user.id, username, message.trim()]
     );
     res.status(201).json(result.rows[0]);
   } catch (e) { res.status(500).json({ error: e.message }); }
