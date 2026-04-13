@@ -324,4 +324,4 @@ node api/index.js
 
 This project was built as part of the **kLab** training program.
 
-© 2025 RestaurantMS — All rights reserved.
+© 2026 RestaurantMS — All rights reserved.
