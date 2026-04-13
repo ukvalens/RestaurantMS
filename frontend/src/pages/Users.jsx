@@ -159,7 +159,7 @@ const Users = () => {
           <i className="fa-solid fa-users" style={{ marginRight: '0.4rem' }} />Users ({users.length})
         </button>
         <button className={`tab ${activeTab === 'permissions' ? 'active' : ''}`} onClick={() => setActiveTab('permissions')}>
-          🔐 Role Permissions
+          <i className="fa-solid fa-shield-halved" style={{ marginRight: '0.4rem' }} />Role Permissions
         </button>
       </div>
 
@@ -185,7 +185,7 @@ const Users = () => {
           <input placeholder="🔍 Search by username or email..."
             value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
           {(search || filterRole) && (
-            <button className="btn-secondary btn-sm" onClick={() => { setSearch(''); setFilterRole(''); setPage(1); }}>✕ Clear</button>
+            <button className="btn-secondary btn-sm" onClick={() => { setSearch(''); setFilterRole(''); setPage(1); }}><i className="fa-solid fa-xmark" /> Clear</button>
           )}
         </div>
 
@@ -213,9 +213,9 @@ const Users = () => {
                   <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{new Date(user.created_at).toLocaleDateString()}</td>
                   <td>
                     <div className="um-actions">
-                      <button className="um-btn-edit" onClick={() => openEdit(user)}>✎ Edit</button>
+                      <button className="um-btn-edit" onClick={() => openEdit(user)}><i className="fa-solid fa-pen" /> Edit</button>
                       <button className="um-btn-reset" onClick={() => setResetUser(user)}><i className="fa-solid fa-key" /> Reset</button>
-                      <button className="um-btn-delete" onClick={() => handleDelete(user.id)}>🗑</button>
+                      <button className="um-btn-delete" onClick={() => handleDelete(user.id)}><i className="fa-solid fa-trash" /></button>
                     </div>
                   </td>
                 </tr>
@@ -247,9 +247,9 @@ const Users = () => {
                 <span>Joined {new Date(user.created_at).toLocaleDateString()}</span>
               </div>
               <div className="um-card-actions">
-                <button className="um-btn-edit" onClick={() => openEdit(user)}>✎ Edit</button>
+                <button className="um-btn-edit" onClick={() => openEdit(user)}><i className="fa-solid fa-pen" /> Edit</button>
                 <button className="um-btn-reset" onClick={() => setResetUser(user)}><i className="fa-solid fa-key" /> Reset Pass</button>
-                <button className="um-btn-delete" onClick={() => handleDelete(user.id)}>🗑 Delete</button>
+                <button className="um-btn-delete" onClick={() => handleDelete(user.id)}><i className="fa-solid fa-trash" /> Delete</button>
               </div>
             </div>
           ))}
@@ -257,7 +257,7 @@ const Users = () => {
 
         {totalPages > 1 && (
           <div className="um-pagination">
-            <button className="btn-secondary btn-sm" onClick={() => setPage(p => p - 1)} disabled={page === 1}>← Prev</button>
+            <button className="btn-secondary btn-sm" onClick={() => setPage(p => p - 1)} disabled={page === 1}><i className="fa-solid fa-arrow-left" /> Prev</button>
             <div className="um-page-nums">
               {Array.from({ length: totalPages }, (_, i) => (
                 <button key={i} className={`um-page-btn ${page === i + 1 ? 'active' : ''}`} onClick={() => setPage(i + 1)}>
@@ -265,7 +265,7 @@ const Users = () => {
                 </button>
               ))}
             </div>
-            <button className="btn-secondary btn-sm" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages}>Next →</button>
+            <button className="btn-secondary btn-sm" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages}>Next <i className="fa-solid fa-arrow-right" /></button>
           </div>
         )}
       </>)}
@@ -304,7 +304,7 @@ const Users = () => {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
             <button className="btn-primary" onClick={savePermissions} disabled={permSaving}>
-              {permSaving ? 'Saving...' : '💾 Save Permissions'}
+              {permSaving ? 'Saving...' : <><i className="fa-solid fa-floppy-disk" style={{ marginRight: '0.4rem' }} />Save Permissions</>}
             </button>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
               {curPerms.length} of {availablePerms.length} permissions enabled for <strong>{permRole}</strong>
@@ -355,7 +355,7 @@ const Users = () => {
       {resetUser && (
         <div className="modal-overlay" onClick={() => setResetUser(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2>🔐 Reset Password</h2>
+            <h2><i className="fa-solid fa-key" style={{ marginRight: '0.5rem' }} />Reset Password</h2>
             <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.9rem' }}>
               Setting new password for <strong>{resetUser.username}</strong>
             </p>
