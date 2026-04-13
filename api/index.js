@@ -145,7 +145,73 @@ r.post('/auth/forgot-password', async (req, res) => {
     const token = jwt.sign({ id: r.rows[0].id }, process.env.JWT_SECRET + '_reset', { expiresIn: '1h' });
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
     const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS } });
-    await transporter.sendMail({ from: `RestaurantMS <${process.env.EMAIL_USER}>`, to: email, subject: 'Password Reset', html: `<a href="${resetUrl}">${resetUrl}</a>` });
+    await transporter.sendMail({
+      from: `RestaurantMS <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Reset Your RestaurantMS Password',
+      html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:40px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
+
+        <!-- Header -->
+        <tr><td style="background:#1e1b4b;border-radius:12px 12px 0 0;padding:32px 40px;text-align:center">
+          <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.5px">
+            &#127860; RestaurantMS
+          </h1>
+          <p style="margin:8px 0 0;color:rgba(255,255,255,0.65);font-size:13px">Restaurant Management System</p>
+        </td></tr>
+
+        <!-- Body -->
+        <tr><td style="background:#ffffff;padding:40px">
+          <h2 style="margin:0 0 8px;color:#1e293b;font-size:20px;font-weight:700">Password Reset Request</h2>
+          <p style="margin:0 0 24px;color:#64748b;font-size:15px;line-height:1.6">
+            Hi <strong style="color:#1e293b">${r.rows[0].username}</strong>,<br><br>
+            We received a request to reset the password for your RestaurantMS account.
+            Click the button below to set a new password. This link expires in <strong>1 hour</strong>.
+          </p>
+
+          <!-- CTA Button -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td align="center" style="padding:8px 0 32px">
+              <a href="${resetUrl}" style="display:inline-block;background:#4f46e5;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:14px 36px;border-radius:10px;letter-spacing:0.02em">
+                Reset My Password
+              </a>
+            </td></tr>
+          </table>
+
+          <!-- Divider -->
+          <hr style="border:none;border-top:1px solid #e2e8f0;margin:0 0 24px">
+
+          <p style="margin:0 0 8px;color:#64748b;font-size:13px;line-height:1.6">
+            If the button doesn't work, copy and paste this link into your browser:
+          </p>
+          <p style="margin:0 0 24px;word-break:break-all">
+            <a href="${resetUrl}" style="color:#4f46e5;font-size:13px">${resetUrl}</a>
+          </p>
+
+          <p style="margin:0;color:#94a3b8;font-size:13px;line-height:1.6">
+            If you didn't request a password reset, you can safely ignore this email.
+            Your password will remain unchanged.
+          </p>
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="background:#f8fafc;border-radius:0 0 12px 12px;padding:24px 40px;text-align:center;border-top:1px solid #e2e8f0">
+          <p style="margin:0 0 4px;color:#94a3b8;font-size:12px">&copy; ${new Date().getFullYear()} RestaurantMS &mdash; All rights reserved</p>
+          <p style="margin:0;color:#94a3b8;font-size:12px">This is an automated message, please do not reply.</p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+    });
     res.json({ message: 'Reset link sent to your email' });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
