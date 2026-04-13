@@ -26,9 +26,10 @@ const Topbar = ({ onMenuClick }) => {
       <div className="topbar-right" ref={ref}>
         <NotificationBell />
         <button className="avatar-btn" onClick={() => setOpen(!open)}>
-          {user?.avatar_url && (
-            <img src={user.avatar_url} alt="profile" className="topbar-avatar-img" />
-          )}
+          {user?.avatar_url
+            ? <img src={user.avatar_url} alt="profile" className="topbar-avatar-img" />
+            : <div className="topbar-avatar-initials">{user?.username?.slice(0,2).toUpperCase()}</div>
+          }
           <div className="avatar-info">
             <span className="avatar-name">{user?.username}</span>
             <span className="avatar-role">{user?.role}</span>
@@ -38,9 +39,10 @@ const Topbar = ({ onMenuClick }) => {
         {open && (
           <div className="profile-dropdown">
             <div className="dropdown-header">
-              {user?.avatar_url && (
-                <img src={user.avatar_url} alt="profile" className="dropdown-avatar-img" />
-              )}
+              {user?.avatar_url
+                ? <img src={user.avatar_url} alt="profile" className="dropdown-avatar-img" />
+                : <div className="dropdown-avatar-initials">{user?.username?.slice(0,2).toUpperCase()}</div>
+              }
               <div>
                 <p className="dropdown-name">{user?.username}</p>
                 <p className="dropdown-email">{user?.email}</p>
