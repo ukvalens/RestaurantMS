@@ -55,7 +55,7 @@ const Home = () => {
       <section style={{ padding: '3rem 6%', background: 'var(--bg)', minHeight: '80vh' }}>
         <div className="section-header">
           <h2><i className="fa-solid fa-utensils" style={{ marginRight: '0.5rem' }} />Menu Highlights</h2>
-          <p>Fresh dishes crafted with passion — explore what we offer</p>
+          <p>Fresh dishes crafted with passion explore what we offer</p>
         </div>
 
         {menuItems.length === 0 ? (
