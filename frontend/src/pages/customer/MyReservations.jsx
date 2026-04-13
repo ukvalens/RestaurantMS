@@ -71,24 +71,26 @@ const MyReservations = () => {
           {filteredRes.length === 0 ? (
             <p className="no-results">No reservations found.</p>
           ) : (
-            <table className="data-table">
-              <thead>
-                <tr><th>ID</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th><th>Special Requests</th></tr>
-              </thead>
-              <tbody>
-                {filteredRes.map(r => (
-                  <tr key={r.id}>
-                    <td>#{r.id}</td>
-                    <td>Table {r.table_number}</td>
-                    <td>{r.reservation_date?.split('T')[0]}</td>
-                    <td>{r.reservation_time}</td>
-                    <td>{r.party_size}</td>
-                    <td><span className={`badge badge-${r.status}`}>{r.status}</span></td>
-                    <td>{r.special_requests || '-'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
+                  <tr><th>ID</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th><th>Special Requests</th></tr>
+                </thead>
+                <tbody>
+                  {filteredRes.map(r => (
+                    <tr key={r.id}>
+                      <td>#{r.id}</td>
+                      <td>Table {r.table_number}</td>
+                      <td>{r.reservation_date?.split('T')[0]}</td>
+                      <td>{r.reservation_time}</td>
+                      <td>{r.party_size}</td>
+                      <td><span className={`badge badge-${r.status}`}>{r.status}</span></td>
+                      <td>{r.special_requests || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}
@@ -111,22 +113,24 @@ const MyReservations = () => {
           {filteredOrd.length === 0 ? (
             <p className="no-results">No orders found.</p>
           ) : (
-            <table className="data-table">
-              <thead>
-                <tr><th>ID</th><th>Table</th><th>Amount</th><th>Status</th><th>Date</th></tr>
-              </thead>
-              <tbody>
-                {filteredOrd.map(o => (
-                  <tr key={o.id}>
-                    <td>#{o.id}</td>
-                    <td>Table {o.table_number}</td>
-                    <td>${parseFloat(o.total_amount).toFixed(2)}</td>
-                    <td><span className={`badge badge-${o.status}`}>{o.status}</span></td>
-                    <td>{o.created_at?.split('T')[0]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
+                  <tr><th>ID</th><th>Table</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                  {filteredOrd.map(o => (
+                    <tr key={o.id}>
+                      <td>#{o.id}</td>
+                      <td>Table {o.table_number}</td>
+                      <td>${parseFloat(o.total_amount).toFixed(2)}</td>
+                      <td><span className={`badge badge-${o.status}`}>{o.status}</span></td>
+                      <td>{o.created_at?.split('T')[0]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}
