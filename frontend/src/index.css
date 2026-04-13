@@ -759,3 +759,29 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
   .ann-card { padding: 1rem; }
   .ann-card-title { font-size: 0.95rem; }
 }
+
+/* ===== PAYMENT SLIP ===== */
+.slip-wrapper { background: white; border-radius: 12px; padding: 2rem; max-width: 480px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+.slip-header { text-align: center; margin-bottom: 1rem; }
+.slip-logo { font-size: 2rem; color: var(--primary); margin-bottom: 0.4rem; }
+.slip-brand { font-size: 1.4rem; font-weight: 800; color: var(--text); margin: 0; }
+.slip-tagline { font-size: 0.82rem; color: var(--text-muted); margin: 0.25rem 0 0; }
+.slip-divider { border: none; border-top: 1px dashed var(--border); margin: 1rem 0; }
+.slip-meta { display: flex; flex-direction: column; gap: 0.35rem; }
+.slip-meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; }
+.slip-meta-row span:first-child { color: var(--text-muted); }
+.slip-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.slip-table th { padding: 0.5rem 0.25rem; border-bottom: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+.slip-table td { padding: 0.5rem 0.25rem; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+.slip-totals { display: flex; flex-direction: column; gap: 0.35rem; }
+.slip-total-row { display: flex; justify-content: space-between; font-size: 0.88rem; color: var(--text-muted); }
+.slip-grand-total { font-size: 1.1rem; font-weight: 800; color: var(--text); border-top: 2px solid var(--text); padding-top: 0.5rem; margin-top: 0.25rem; }
+.slip-footer { text-align: center; font-size: 0.82rem; color: var(--text-muted); }
+
+@media print {
+  .no-print { display: none !important; }
+  .sidebar-wrapper, .topbar, .app-footer { display: none !important; }
+  .main-content { padding: 0 !important; }
+  .slip-wrapper { box-shadow: none; border: none; max-width: 100%; }
+  body { background: white; }
+}

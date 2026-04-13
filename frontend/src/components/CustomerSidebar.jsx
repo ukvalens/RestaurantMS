@@ -2,12 +2,13 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
-  { to: '/customer/menu',            label: 'Menu',             icon: 'fa-utensils',       perm: 'menu' },
-  { to: '/customer/reserve',         label: 'Make Reservation', icon: 'fa-calendar-plus',  perm: 'reserve' },
-  { to: '/customer/my-reservations', label: 'My Reservations',  icon: 'fa-calendar-check', perm: 'my-reservations' },
-  { to: '/customer/my-orders',       label: 'My Orders',        icon: 'fa-bag-shopping',   perm: 'my-orders' },
-  { to: '/customer/my-deliveries',   label: 'My Deliveries',    icon: 'fa-truck',          perm: 'my-deliveries' },
-  { to: '/customer/announcements',   label: 'Announcements',    icon: 'fa-bullhorn',       perm: 'announcements' },
+  { to: '/customer/dashboard',        label: 'Dashboard',         icon: 'fa-gauge',          perm: 'dashboard' },
+  { to: '/customer/menu',             label: 'Browse Menu',        icon: 'fa-utensils',       perm: 'menu' },
+  { to: '/customer/reserve',          label: 'Make Reservation',   icon: 'fa-calendar-plus',  perm: 'reserve' },
+  { to: '/customer/my-reservations',  label: 'My Reservations',    icon: 'fa-calendar-check', perm: 'my-reservations' },
+  { to: '/customer/my-orders',        label: 'My Orders & Slips',  icon: 'fa-receipt',        perm: 'my-orders' },
+  { to: '/customer/my-deliveries',    label: 'My Deliveries',      icon: 'fa-truck',          perm: 'my-deliveries' },
+  { to: '/customer/announcements',    label: 'Announcements',      icon: 'fa-bullhorn',       perm: 'announcements' },
 ];
 
 const CustomerSidebar = ({ onClose }) => {

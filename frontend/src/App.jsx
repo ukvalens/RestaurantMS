@@ -29,6 +29,7 @@ import MyOrders from './pages/customer/MyOrders';
 import Announcements from './pages/Announcements';
 import Deliveries from './pages/Deliveries';
 import MyDeliveries from './pages/customer/MyDeliveries';
+import PaymentSlip from './pages/PaymentSlip';
 
 const STAFF = ['admin', 'manager', 'waiter', 'delivery'];
 
@@ -52,6 +53,7 @@ function App() {
             <Route path="tables" element={<Tables />} />
             <Route path="menu" element={<Menu />} />
             <Route path="orders" element={<Orders />} />
+            <Route path="orders/:id/slip" element={<PaymentSlip />} />
             <Route path="reservations" element={<Reservations />} />
             <Route path="payments" element={<ProtectedRoute roles={['admin', 'manager']}><Payments /></ProtectedRoute>} />
             <Route path="users" element={<ProtectedRoute roles={['admin']}><Users /></ProtectedRoute>} />

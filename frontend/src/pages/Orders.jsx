@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
@@ -138,6 +139,11 @@ const Orders = () => {
                 {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
               <button className="btn-secondary btn-sm" onClick={() => viewDetail(o.id)}><i className="fa-solid fa-eye" /> View</button>
+              {['served','completed'].includes(o.status) && (
+                <button className="btn-secondary btn-sm" onClick={() => navigate(`/app/orders/${o.id}/slip`)} title="Generate Payment Slip">
+                  <i className="fa-solid fa-receipt" /> Slip
+                </button>
+              )}
               {['admin', 'manager'].includes(user?.role) && (
                 <button className="btn-danger btn-sm" onClick={() => handleDelete(o.id)}><i className="fa-solid fa-trash" /></button>
               )}
@@ -150,7 +156,7 @@ const Orders = () => {
       <div className="ord-table-wrapper">
         <table className="data-table">
           <thead>
-            <tr><th>ID</th><th>Table</th><th>Waiter</th><th>Amount</th><th>Status</th><th>Update</th><th>Details</th>{['admin', 'manager'].includes(user?.role) && <th>Action</th>}</tr>
+            <tr><th>ID</th><th>Table</th><th>Waiter</th><th>Amount</th><th>Status</th><th>Update</th><th>View</th><th>Slip</th>{['admin', 'manager'].includes(user?.role) && <th>Action</th>}</tr>
           </thead>
           <tbody>
             {filtered.map(o => (
@@ -166,6 +172,11 @@ const Orders = () => {
                   </select>
                 </td>
                 <td><button className="btn-secondary btn-sm" onClick={() => viewDetail(o.id)}><i className="fa-solid fa-eye" /> View</button></td>
+                <td>{['served','completed'].includes(o.status) && (
+                  <button className="btn-secondary btn-sm" onClick={() => navigate(`/app/orders/${o.id}/slip`)}>
+                    <i className="fa-solid fa-receipt" /> Slip
+                  </button>
+                )}</td>
                 {['admin', 'manager'].includes(user?.role) && (
                   <td><button className="btn-danger btn-sm" onClick={() => handleDelete(o.id)}><i className="fa-solid fa-trash" /></button></td>
                 )}
