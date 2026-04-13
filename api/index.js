@@ -239,6 +239,43 @@ r.post('/auth/reset-user-password', authMiddleware, roleCheck('admin'), async (r
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// ── PERMISSIONS ───────────────────────────────────────────────────────────────
+const DEFAULT_PERMISSIONS = {
+  admin:    ['dashboard','tables','menu','orders','reservations','payments','users','deliveries','announcements','reports'],
+  manager:  ['dashboard','tables','menu','orders','reservations','payments','deliveries','announcements','reports'],
+  waiter:   ['dashboard','tables','menu','orders','reservations','announcements'],
+  delivery: ['dashboard','deliveries','announcements'],
+  customer: ['dashboard','menu','reserve','my-reservations','my-orders','my-deliveries','announcements'],
+};
+const ALL_PERMISSIONS = ['dashboard','tables','menu','orders','reservations','payments','users','deliveries','announcements','reports','reserve','my-reservations','my-orders','my-deliveries'];
+const permStore = JSON.parse(JSON.stringify(DEFAULT_PERMISSIONS));
+
+// Load saved permissions from DB on startup
+(async () => {
+  try {
+    await pool.query(`CREATE TABLE IF NOT EXISTS role_permissions (role VARCHAR(20) PRIMARY KEY, permissions TEXT NOT NULL)`);
+    for (const [role, perms] of Object.entries(DEFAULT_PERMISSIONS)) {
+      await pool.query(`INSERT INTO role_permissions (role, permissions) VALUES ($1,$2) ON CONFLICT (role) DO NOTHING`, [role, JSON.stringify(perms)]);
+    }
+    const rows = (await pool.query('SELECT role, permissions FROM role_permissions')).rows;
+    rows.forEach(row => { permStore[row.role] = JSON.parse(row.permissions); });
+  } catch (_) {}
+})();
+
+r.get('/auth/permissions', async (req, res) => {
+  res.json({ permissions: permStore, allPermissions: ALL_PERMISSIONS });
+});
+
+r.put('/auth/permissions', authMiddleware, roleCheck('admin'), async (req, res) => {
+  const { role, permissions } = req.body;
+  if (!role || !Array.isArray(permissions)) return res.status(400).json({ error: 'role and permissions[] required' });
+  permStore[role] = permissions;
+  try {
+    await pool.query(`INSERT INTO role_permissions (role, permissions) VALUES ($1,$2) ON CONFLICT (role) DO UPDATE SET permissions=$2`, [role, JSON.stringify(permissions)]);
+  } catch (_) {}
+  res.json({ role, permissions });
+});
+
 // ── MENU ──────────────────────────────────────────────────────────────────────
 r.get('/menu/items/public', async (req, res) => {
   try {
