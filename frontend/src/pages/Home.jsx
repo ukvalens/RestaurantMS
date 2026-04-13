@@ -19,7 +19,6 @@ const Home = () => {
   const pageItems = menuItems.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
   const dashLink = user?.role === 'customer' ? '/customer/dashboard' : '/app/dashboard';
 
-  // Auto-slide every 5 seconds
   const nextPage = useCallback(() => {
     setPage(p => (p + 1) % Math.max(1, totalPages));
   }, [totalPages]);
@@ -35,10 +34,14 @@ const Home = () => {
 
       {/* Navbar */}
       <nav className="home-nav">
-        <div className="home-nav-brand">🍴 RestaurantMS</div>
+        <div className="home-nav-brand">
+          <i className="fa-solid fa-utensils" style={{ marginRight: '0.5rem' }} />RestaurantMS
+        </div>
         <div className="home-nav-links">
           {token ? (
-            <Link to={dashLink} className="home-nav-btn">Go to Dashboard →</Link>
+            <Link to={dashLink} className="home-nav-btn">
+              Go to Dashboard <i className="fa-solid fa-arrow-right" style={{ marginLeft: '0.3rem' }} />
+            </Link>
           ) : (
             <>
               <Link to="/login" className="home-nav-btn-outline">Sign In</Link>
@@ -51,7 +54,7 @@ const Home = () => {
       {/* Menu Highlights */}
       <section style={{ padding: '3rem 6%', background: 'var(--bg)', minHeight: '80vh' }}>
         <div className="section-header">
-          <h2>🍽️ Menu Highlights</h2>
+          <h2><i className="fa-solid fa-utensils" style={{ marginRight: '0.5rem' }} />Menu Highlights</h2>
           <p>Fresh dishes crafted with passion — explore what we offer</p>
         </div>
 
@@ -66,7 +69,9 @@ const Home = () => {
                   onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
                   {item.image_url
                     ? <img src={item.image_url} alt={item.name} className="menu-img" onError={e => e.target.style.display = 'none'} />
-                    : <div style={{ height: 150, background: 'linear-gradient(135deg,#ede9fe,#dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>🍽️</div>
+                    : <div style={{ height: 150, background: 'linear-gradient(135deg,#ede9fe,#dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', color: 'var(--primary)' }}>
+                        <i className="fa-solid fa-utensils" />
+                      </div>
                   }
                   <div className="menu-card-body">
                     <span className="menu-category">{item.category_name}</span>
@@ -95,7 +100,7 @@ const Home = () => {
 
             <div style={{ textAlign: 'center', marginTop: '2rem' }}>
               <Link to={token ? (user?.role === 'customer' ? '/customer/menu' : '/app/menu') : '/register'} className="hero-btn-primary">
-                View Full Menu →
+                View Full Menu <i className="fa-solid fa-arrow-right" style={{ marginLeft: '0.3rem' }} />
               </Link>
             </div>
           </>

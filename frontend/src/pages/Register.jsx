@@ -43,44 +43,46 @@ const Register = () => {
       <div className="auth-split">
         <div className="auth-info">
           <div className="auth-info-inner">
-            <div className="auth-info-logo">🍴</div>
+            <div className="auth-info-logo">
+              <i className="fa-solid fa-utensils" />
+            </div>
             <h2>Join RestaurantMS</h2>
             <p>Create your account and get instant access to a smarter way of managing your restaurant experience.</p>
             <ul className="auth-features">
-              <li>🪑 Book & manage reservations</li>
-              <li>🛒 Place and track orders</li>
-              <li>🍽️ Browse our full menu</li>
-              <li>💳 Fast & secure payments</li>
+              <li><i className="fa-solid fa-calendar-plus" style={{ marginRight: '0.5rem' }} />Book &amp; manage reservations</li>
+              <li><i className="fa-solid fa-cart-shopping" style={{ marginRight: '0.5rem' }} />Place and track orders</li>
+              <li><i className="fa-solid fa-utensils" style={{ marginRight: '0.5rem' }} />Browse our full menu</li>
+              <li><i className="fa-solid fa-credit-card" style={{ marginRight: '0.5rem' }} />Fast &amp; secure payments</li>
             </ul>
           </div>
         </div>
         <div className="auth-card">
-          <h1>🍴 RestaurantMS</h1>
+          <h1><i className="fa-solid fa-utensils" style={{ marginRight: '0.5rem' }} />RestaurantMS</h1>
           <h2>Create Account</h2>
           <form onSubmit={handleSubmit}>
             <div className="auth-input-group">
-              <span className="auth-input-icon">👤</span>
+              <span className="auth-input-icon"><i className="fa-solid fa-user" /></span>
               <input placeholder="Username" value={form.username}
                 onChange={e => setForm({ ...form, username: e.target.value })} required />
             </div>
             <div className="auth-input-group">
-              <span className="auth-input-icon">✉️</span>
+              <span className="auth-input-icon"><i className="fa-solid fa-envelope" /></span>
               <input type="email" placeholder="Email address" value={form.email}
                 onChange={e => { setForm({ ...form, email: e.target.value }); setErrors(p => ({ ...p, email: null })); }} required />
             </div>
             {errors.email && <span className="field-error">{errors.email}</span>}
             <div className="auth-input-group">
-              <span className="auth-input-icon">🔒</span>
+              <span className="auth-input-icon"><i className="fa-solid fa-lock" /></span>
               <input type="password" placeholder="Password" value={form.password}
                 onChange={e => { setForm({ ...form, password: e.target.value }); setErrors(p => ({ ...p, password: null })); }} required />
             </div>
             {errors.password && (
               <ul className="password-rules">
-                {errors.password.map(r => <li key={r}>✗ {r}</li>)}
+                {errors.password.map(r => <li key={r}><i className="fa-solid fa-xmark" style={{ marginRight: '0.3rem' }} />{r}</li>)}
               </ul>
             )}
             <button type="submit" className="auth-submit-btn" disabled={loading}>
-              {loading ? 'Creating account...' : 'Create Account →'}
+              {loading ? 'Creating account...' : <>Create Account <i className="fa-solid fa-arrow-right" /></>}
             </button>
           </form>
           <div className="auth-links">
