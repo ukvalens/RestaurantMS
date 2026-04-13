@@ -315,32 +315,32 @@ const DEFAULT_PERMISSIONS = {
   customer: ['dashboard','menu','reserve','my-reservations','my-orders','my-deliveries','announcements'],
 };
 const ALL_PERMISSIONS = ['dashboard','tables','menu','orders','reservations','payments','users','deliveries','announcements','reports','reserve','my-reservations','my-orders','my-deliveries'];
-const permStore = JSON.parse(JSON.stringify(DEFAULT_PERMISSIONS));
 
-// Load saved permissions from DB on startup
-(async () => {
+// Always read from DB — no in-memory cache (Vercel serverless = stateless)
+r.get('/auth/permissions', async (req, res) => {
   try {
     await pool.query(`CREATE TABLE IF NOT EXISTS role_permissions (role VARCHAR(20) PRIMARY KEY, permissions TEXT NOT NULL)`);
+    // Seed defaults for any missing roles
     for (const [role, perms] of Object.entries(DEFAULT_PERMISSIONS)) {
       await pool.query(`INSERT INTO role_permissions (role, permissions) VALUES ($1,$2) ON CONFLICT (role) DO NOTHING`, [role, JSON.stringify(perms)]);
     }
     const rows = (await pool.query('SELECT role, permissions FROM role_permissions')).rows;
-    rows.forEach(row => { permStore[row.role] = JSON.parse(row.permissions); });
-  } catch (_) {}
-})();
-
-r.get('/auth/permissions', async (req, res) => {
-  res.json({ permissions: permStore, allPermissions: ALL_PERMISSIONS });
+    const map = {};
+    rows.forEach(row => { map[row.role] = JSON.parse(row.permissions); });
+    res.json({ permissions: map, allPermissions: ALL_PERMISSIONS });
+  } catch (e) {
+    // Fallback to defaults if DB fails
+    res.json({ permissions: DEFAULT_PERMISSIONS, allPermissions: ALL_PERMISSIONS });
+  }
 });
 
 r.put('/auth/permissions', authMiddleware, roleCheck('admin'), async (req, res) => {
   const { role, permissions } = req.body;
   if (!role || !Array.isArray(permissions)) return res.status(400).json({ error: 'role and permissions[] required' });
-  permStore[role] = permissions;
   try {
     await pool.query(`INSERT INTO role_permissions (role, permissions) VALUES ($1,$2) ON CONFLICT (role) DO UPDATE SET permissions=$2`, [role, JSON.stringify(permissions)]);
-  } catch (_) {}
-  res.json({ role, permissions });
+    res.json({ role, permissions });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ── MENU ──────────────────────────────────────────────────────────────────────

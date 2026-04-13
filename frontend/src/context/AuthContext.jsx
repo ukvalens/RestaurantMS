@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import api from '../api/axios';
 
 const AuthContext = createContext();
@@ -9,18 +9,28 @@ export const AuthProvider = ({ children }) => {
   const [permissions, setPermissions] = useState(() => {
     try { return JSON.parse(localStorage.getItem('permissions')) || {}; } catch { return {}; }
   });
+  const intervalRef = useRef(null);
 
-  useEffect(() => {
-    api.get('/auth/permissions').then(res => {
+  const fetchPermissions = async () => {
+    try {
+      const res = await api.get('/auth/permissions');
       setPermissions(res.data.permissions);
       localStorage.setItem('permissions', JSON.stringify(res.data.permissions));
-    }).catch(() => {});
+    } catch {}
+  };
+
+  useEffect(() => {
+    // Fetch immediately on load
+    fetchPermissions();
+    // Poll every 30s so permission changes from admin apply without re-login
+    intervalRef.current = setInterval(fetchPermissions, 30000);
+    return () => clearInterval(intervalRef.current);
   }, []);
 
   const hasPermission = (perm) => {
     if (!user) return false;
     const rolePerms = permissions[user.role];
-    if (!rolePerms) return true; // fallback: allow if no config loaded yet
+    if (!rolePerms) return true; // allow if not yet loaded
     return rolePerms.includes(perm);
   };
 
@@ -33,14 +43,18 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(res.data.user));
     setToken(res.data.token);
     setUser(res.data.user);
+    // Fetch fresh permissions on login
+    await fetchPermissions();
     return res.data.user;
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('permissions');
     setToken(null);
     setUser(null);
+    setPermissions({});
   };
 
   const updateUser = (updatedFields) => {
@@ -50,9 +64,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const refreshPermissions = async () => {
-    const res = await api.get('/auth/permissions');
-    setPermissions(res.data.permissions);
-    localStorage.setItem('permissions', JSON.stringify(res.data.permissions));
+    await fetchPermissions();
   };
 
   return (
