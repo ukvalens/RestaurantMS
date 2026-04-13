@@ -244,6 +244,60 @@ exports.resetUserPassword = async (req, res) => {
   }
 };
 
+const DEFAULT_PERMISSIONS = {
+  admin:    ['dashboard','tables','menu','orders','reservations','payments','users','deliveries','announcements','reports'],
+  manager:  ['dashboard','tables','menu','orders','reservations','payments','deliveries','announcements','reports'],
+  waiter:   ['dashboard','tables','menu','orders','reservations','announcements'],
+  delivery: ['dashboard','deliveries','announcements'],
+  customer: ['dashboard','menu','reserve','my-reservations','my-orders','my-deliveries','announcements'],
+};
+
+const ALL_PERMISSIONS = ['dashboard','tables','menu','orders','reservations','payments','users','deliveries','announcements','reports','reserve','my-reservations','my-orders','my-deliveries'];
+
+async function ensurePermissionsTable() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS role_permissions (
+      role VARCHAR(20) PRIMARY KEY,
+      permissions JSONB NOT NULL
+    )
+  `);
+  for (const [role, perms] of Object.entries(DEFAULT_PERMISSIONS)) {
+    await pool.query(
+      `INSERT INTO role_permissions (role, permissions) VALUES ($1, $2)
+       ON CONFLICT (role) DO NOTHING`,
+      [role, JSON.stringify(perms)]
+    );
+  }
+}
+
+exports.getPermissions = async (req, res) => {
+  try {
+    await ensurePermissionsTable();
+    const result = await pool.query('SELECT role, permissions FROM role_permissions ORDER BY role');
+    const map = {};
+    result.rows.forEach(r => { map[r.role] = r.permissions; });
+    res.json({ permissions: map, allPermissions: ALL_PERMISSIONS });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updatePermissions = async (req, res) => {
+  const { role, permissions } = req.body;
+  if (!role || !Array.isArray(permissions)) return res.status(400).json({ error: 'role and permissions[] required' });
+  try {
+    await ensurePermissionsTable();
+    await pool.query(
+      `INSERT INTO role_permissions (role, permissions) VALUES ($1, $2)
+       ON CONFLICT (role) DO UPDATE SET permissions = $2`,
+      [role, JSON.stringify(permissions)]
+    );
+    res.json({ role, permissions });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   try {

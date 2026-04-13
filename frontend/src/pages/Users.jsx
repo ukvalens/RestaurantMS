@@ -9,7 +9,19 @@ const roleBadgeColor = {
   delivery: '#d97706', customer: '#64748b',
 };
 
+const PERM_LABELS = {
+  dashboard: '📊 Dashboard', tables: '🪑 Tables', menu: '🍽️ Menu',
+  orders: '📦 Orders', reservations: '📅 Reservations', payments: '💳 Payments',
+  users: '👥 Users', deliveries: '🚚 Deliveries', announcements: '📢 Announcements',
+  reports: '📈 Reports', reserve: '📅 Make Reservation', 'my-reservations': '📋 My Reservations',
+  'my-orders': '🛒 My Orders', 'my-deliveries': '🚚 My Deliveries',
+};
+
+const STAFF_PERMS = ['dashboard','tables','menu','orders','reservations','payments','users','deliveries','announcements','reports'];
+const CUSTOMER_PERMS = ['dashboard','menu','reserve','my-reservations','my-orders','my-deliveries','announcements'];
+
 const Users = () => {
+  const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -22,7 +34,13 @@ const Users = () => {
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 6;
 
-  useEffect(() => { fetchUsers(); }, []);
+  // Permissions state
+  const [permissions, setPermissions] = useState({});
+  const [allPerms, setAllPerms] = useState([]);
+  const [permRole, setPermRole] = useState('waiter');
+  const [permSaving, setPermSaving] = useState(false);
+
+  useEffect(() => { fetchUsers(); fetchPermissions(); }, []);
 
   const fetchUsers = async () => {
     try {
@@ -32,6 +50,32 @@ const Users = () => {
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to fetch users');
     } finally { setLoading(false); }
+  };
+
+  const fetchPermissions = async () => {
+    try {
+      const res = await axios.get('/auth/permissions');
+      setPermissions(res.data.permissions);
+      setAllPerms(res.data.allPermissions);
+    } catch { /* silent */ }
+  };
+
+  const togglePerm = (perm) => {
+    const cur = permissions[permRole] || [];
+    setPermissions(prev => ({
+      ...prev,
+      [permRole]: cur.includes(perm) ? cur.filter(p => p !== perm) : [...cur, perm],
+    }));
+  };
+
+  const savePermissions = async () => {
+    setPermSaving(true);
+    try {
+      await axios.put('/auth/permissions', { role: permRole, permissions: permissions[permRole] || [] });
+      toast.success(`Permissions updated for ${permRole}`);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to save');
+    } finally { setPermSaving(false); }
   };
 
   const handleSubmit = async (e) => {
@@ -90,49 +134,181 @@ const Users = () => {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  // Role counts for summary
   const roleCounts = ROLES.reduce((acc, r) => ({ ...acc, [r]: users.filter(u => u.role === r).length }), {});
+
+  const availablePerms = permRole === 'customer' ? CUSTOMER_PERMS : STAFF_PERMS;
+  const curPerms = permissions[permRole] || [];
 
   if (loading) return <div className="page"><p style={{ color: 'var(--text-muted)' }}>Loading users...</p></div>;
 
   return (
     <div className="page">
-      {/* Header */}
       <div className="page-header">
         <h1 className="page-title">👥 User Management</h1>
-        <button className="btn-primary" onClick={() => { closeForm(); setShowForm(true); }}>
-          ➕ Add User
-        </button>
-      </div>
-
-      {/* Role summary chips */}
-      <div className="um-role-summary">
-        {ROLES.map(r => (
-          <button key={r} className={`um-role-chip ${filterRole === r ? 'active' : ''}`}
-            style={{ '--chip-color': roleBadgeColor[r] }}
-            onClick={() => { setFilterRole(filterRole === r ? '' : r); setPage(1); }}>
-            <span className="um-role-chip-dot" />
-            {r} <strong>{roleCounts[r]}</strong>
-          </button>
-        ))}
-        <button className={`um-role-chip ${!filterRole ? 'active' : ''}`}
-          style={{ '--chip-color': '#4f46e5' }}
-          onClick={() => { setFilterRole(''); setPage(1); }}>
-          all <strong>{users.length}</strong>
-        </button>
-      </div>
-
-      {/* Search */}
-      <div className="um-search-bar">
-        <input placeholder="🔍 Search by username or email..."
-          value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
-        {(search || filterRole) && (
-          <button className="btn-secondary btn-sm" onClick={() => { setSearch(''); setFilterRole(''); setPage(1); }}>✕ Clear</button>
+        {activeTab === 'users' && (
+          <button className="btn-primary" onClick={() => { closeForm(); setShowForm(true); }}>➕ Add User</button>
         )}
       </div>
 
-      <p className="menu-count">{filtered.length} user{filtered.length !== 1 ? 's' : ''} found</p>
+      {/* Main tabs */}
+      <div className="tabs" style={{ marginBottom: '1.5rem' }}>
+        <button className={`tab ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
+          👥 Users ({users.length})
+        </button>
+        <button className={`tab ${activeTab === 'permissions' ? 'active' : ''}`} onClick={() => setActiveTab('permissions')}>
+          🔐 Role Permissions
+        </button>
+      </div>
+
+      {/* ── USERS TAB ── */}
+      {activeTab === 'users' && (<>
+        <div className="um-role-summary">
+          {ROLES.map(r => (
+            <button key={r} className={`um-role-chip ${filterRole === r ? 'active' : ''}`}
+              style={{ '--chip-color': roleBadgeColor[r] }}
+              onClick={() => { setFilterRole(filterRole === r ? '' : r); setPage(1); }}>
+              <span className="um-role-chip-dot" />
+              {r} <strong>{roleCounts[r]}</strong>
+            </button>
+          ))}
+          <button className={`um-role-chip ${!filterRole ? 'active' : ''}`}
+            style={{ '--chip-color': '#4f46e5' }}
+            onClick={() => { setFilterRole(''); setPage(1); }}>
+            all <strong>{users.length}</strong>
+          </button>
+        </div>
+
+        <div className="um-search-bar">
+          <input placeholder="🔍 Search by username or email..."
+            value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
+          {(search || filterRole) && (
+            <button className="btn-secondary btn-sm" onClick={() => { setSearch(''); setFilterRole(''); setPage(1); }}>✕ Clear</button>
+          )}
+        </div>
+
+        <p className="menu-count">{filtered.length} user{filtered.length !== 1 ? 's' : ''} found</p>
+
+        {/* Desktop table */}
+        <div className="um-table-wrapper">
+          <table className="um-table">
+            <thead>
+              <tr><th>#</th><th>User</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              {paged.length === 0 ? (
+                <tr><td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>No users found.</td></tr>
+              ) : paged.map(user => (
+                <tr key={user.id}>
+                  <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{user.id}</td>
+                  <td><strong>{user.username}</strong></td>
+                  <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{user.email}</td>
+                  <td>
+                    <span className="um-role-badge" style={{ background: roleBadgeColor[user.role] + '20', color: roleBadgeColor[user.role], border: `1px solid ${roleBadgeColor[user.role]}40` }}>
+                      {user.role}
+                    </span>
+                  </td>
+                  <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{new Date(user.created_at).toLocaleDateString()}</td>
+                  <td>
+                    <div className="um-actions">
+                      <button className="um-btn-edit" onClick={() => openEdit(user)}>✎ Edit</button>
+                      <button className="um-btn-reset" onClick={() => setResetUser(user)}>🔐 Reset</button>
+                      <button className="um-btn-delete" onClick={() => handleDelete(user.id)}>🗑</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile cards */}
+        <div className="um-cards">
+          {paged.length === 0 ? (
+            <p className="no-results">No users found.</p>
+          ) : paged.map(user => (
+            <div key={user.id} className="um-card">
+              <div className="um-card-top">
+                <div className="um-card-avatar" style={{ background: roleBadgeColor[user.role] + '20', color: roleBadgeColor[user.role] }}>
+                  {user.username.charAt(0).toUpperCase()}
+                </div>
+                <div className="um-card-info">
+                  <strong>{user.username}</strong>
+                  <span className="um-card-email">{user.email}</span>
+                </div>
+                <span className="um-role-badge" style={{ background: roleBadgeColor[user.role] + '20', color: roleBadgeColor[user.role], border: `1px solid ${roleBadgeColor[user.role]}40` }}>
+                  {user.role}
+                </span>
+              </div>
+              <div className="um-card-meta">
+                <span>#{user.id}</span>
+                <span>Joined {new Date(user.created_at).toLocaleDateString()}</span>
+              </div>
+              <div className="um-card-actions">
+                <button className="um-btn-edit" onClick={() => openEdit(user)}>✎ Edit</button>
+                <button className="um-btn-reset" onClick={() => setResetUser(user)}>🔐 Reset Pass</button>
+                <button className="um-btn-delete" onClick={() => handleDelete(user.id)}>🗑 Delete</button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {totalPages > 1 && (
+          <div className="um-pagination">
+            <button className="btn-secondary btn-sm" onClick={() => setPage(p => p - 1)} disabled={page === 1}>← Prev</button>
+            <div className="um-page-nums">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button key={i} className={`um-page-btn ${page === i + 1 ? 'active' : ''}`} onClick={() => setPage(i + 1)}>
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+            <button className="btn-secondary btn-sm" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages}>Next →</button>
+          </div>
+        )}
+      </>)}
+
+      {/* ── PERMISSIONS TAB ── */}
+      {activeTab === 'permissions' && (
+        <div className="card">
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
+            Define which pages and features each role can access. Changes take effect on next login.
+          </p>
+
+          {/* Role selector */}
+          <div className="perm-role-tabs">
+            {ROLES.map(r => (
+              <button key={r} className={`perm-role-tab ${permRole === r ? 'active' : ''}`}
+                style={{ '--role-color': roleBadgeColor[r] }}
+                onClick={() => setPermRole(r)}>
+                <span className="perm-role-dot" style={{ background: roleBadgeColor[r] }} />
+                {r.charAt(0).toUpperCase() + r.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {/* Permission grid */}
+          <div className="perm-grid">
+            {availablePerms.map(perm => {
+              const checked = curPerms.includes(perm);
+              return (
+                <label key={perm} className={`perm-item ${checked ? 'checked' : ''}`}>
+                  <input type="checkbox" checked={checked} onChange={() => togglePerm(perm)} />
+                  <span className="perm-item-label">{PERM_LABELS[perm] || perm}</span>
+                </label>
+              );
+            })}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
+            <button className="btn-primary" onClick={savePermissions} disabled={permSaving}>
+              {permSaving ? 'Saving...' : '💾 Save Permissions'}
+            </button>
+            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+              {curPerms.length} of {availablePerms.length} permissions enabled for <strong>{permRole}</strong>
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Create / Edit Modal */}
       {showForm && (
@@ -192,92 +368,6 @@ const Users = () => {
               </div>
             </form>
           </div>
-        </div>
-      )}
-
-      {/* Desktop table */}
-      <div className="um-table-wrapper">
-        <table className="um-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>User</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Joined</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paged.length === 0 ? (
-              <tr><td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>No users found.</td></tr>
-            ) : paged.map(user => (
-              <tr key={user.id}>
-                <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{user.id}</td>
-                <td><strong>{user.username}</strong></td>
-                <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{user.email}</td>
-                <td>
-                  <span className="um-role-badge" style={{ background: roleBadgeColor[user.role] + '20', color: roleBadgeColor[user.role], border: `1px solid ${roleBadgeColor[user.role]}40` }}>
-                    {user.role}
-                  </span>
-                </td>
-                <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{new Date(user.created_at).toLocaleDateString()}</td>
-                <td>
-                  <div className="um-actions">
-                    <button className="um-btn-edit" onClick={() => openEdit(user)}>✎ Edit</button>
-                    <button className="um-btn-reset" onClick={() => setResetUser(user)}>🔐 Reset</button>
-                    <button className="um-btn-delete" onClick={() => handleDelete(user.id)}>🗑</button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile / Tablet cards */}
-      <div className="um-cards">
-        {paged.length === 0 ? (
-          <p className="no-results">No users found.</p>
-        ) : paged.map(user => (
-          <div key={user.id} className="um-card">
-            <div className="um-card-top">
-              <div className="um-card-avatar" style={{ background: roleBadgeColor[user.role] + '20', color: roleBadgeColor[user.role] }}>
-                {user.username.charAt(0).toUpperCase()}
-              </div>
-              <div className="um-card-info">
-                <strong>{user.username}</strong>
-                <span className="um-card-email">{user.email}</span>
-              </div>
-              <span className="um-role-badge" style={{ background: roleBadgeColor[user.role] + '20', color: roleBadgeColor[user.role], border: `1px solid ${roleBadgeColor[user.role]}40` }}>
-                {user.role}
-              </span>
-            </div>
-            <div className="um-card-meta">
-              <span>#{user.id}</span>
-              <span>Joined {new Date(user.created_at).toLocaleDateString()}</span>
-            </div>
-            <div className="um-card-actions">
-              <button className="um-btn-edit" onClick={() => openEdit(user)}>✎ Edit</button>
-              <button className="um-btn-reset" onClick={() => setResetUser(user)}>🔐 Reset Pass</button>
-              <button className="um-btn-delete" onClick={() => handleDelete(user.id)}>🗑 Delete</button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="um-pagination">
-          <button className="btn-secondary btn-sm" onClick={() => setPage(p => p - 1)} disabled={page === 1}>← Prev</button>
-          <div className="um-page-nums">
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button key={i} className={`um-page-btn ${page === i + 1 ? 'active' : ''}`} onClick={() => setPage(i + 1)}>
-                {i + 1}
-              </button>
-            ))}
-          </div>
-          <button className="btn-secondary btn-sm" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages}>Next →</button>
         </div>
       )}
     </div>
