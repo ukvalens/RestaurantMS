@@ -16,6 +16,7 @@ const Orders = () => {
   const [form, setForm] = useState({ table_id: '', items: [{ menu_item_id: '', quantity: 1, price: '', special_instructions: '' }] });
   const [orderDetail, setOrderDetail] = useState(null);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const fetchOrders = async () => { const res = await api.get('/orders'); setOrders(res.data); };
 

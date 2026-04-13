@@ -458,7 +458,10 @@ r.get('/orders', authMiddleware, async (req, res) => {
 
 r.get('/orders/:id', authMiddleware, async (req, res) => {
   try {
-    const order = await pool.query('SELECT * FROM orders WHERE id=$1', [req.params.id]);
+    const order = await pool.query(
+      'SELECT o.*, t.table_number, u.username as waiter_name FROM orders o LEFT JOIN tables t ON o.table_id=t.id LEFT JOIN users u ON o.waiter_id=u.id WHERE o.id=$1',
+      [req.params.id]
+    );
     const items = await pool.query('SELECT oi.*,mi.name FROM order_items oi LEFT JOIN menu_items mi ON oi.menu_item_id=mi.id WHERE oi.order_id=$1', [req.params.id]);
     res.json({ order: order.rows[0], items: items.rows });
   } catch (e) { res.status(500).json({ error: e.message }); }
