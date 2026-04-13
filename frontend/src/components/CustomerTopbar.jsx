@@ -21,7 +21,6 @@ const CustomerTopbar = ({ onMenuClick }) => {
     <header className="topbar">
       <div className="topbar-left">
         <button className="hamburger-btn" onClick={onMenuClick}>☰</button>
-        <h2 className="topbar-title">Welcome, {user?.username} 👋</h2>
       </div>
       <div className="topbar-right" ref={ref}>
         <NotificationBell />

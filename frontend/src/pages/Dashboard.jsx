@@ -47,13 +47,7 @@ const Dashboard = () => {
   return (
     <div className="page">
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <div>
-          <h1 className="page-title" style={{ marginBottom: '0.25rem' }}>Dashboard</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Welcome back, <strong>{user?.username}</strong> —
-            <span className="role-badge" style={{ marginLeft: '0.4rem', background: 'var(--primary)' }}>{user?.role}</span>
-          </p>
-        </div>
+        <h1 className="page-title">Dashboard</h1>
       </div>
 
       <div className="stats-grid">
