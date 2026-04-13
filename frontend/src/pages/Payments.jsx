@@ -52,18 +52,18 @@ const Payments = () => {
 
   const totalRevenue = filtered.reduce((sum, p) => sum + parseFloat(p.amount), 0);
 
-  const methodIcon = { cash: '💵', card: '💳', online: '🌐' };
+  const methodIcon = { cash: 'fa-money-bill', card: 'fa-credit-card', online: 'fa-globe' };
 
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">💳 Payments</h1>
+        <h1 className="page-title">Payments</h1>
         <button className="btn-primary" onClick={() => setShowForm(!showForm)}>+ Process Payment</button>
       </div>
 
       {/* Revenue stat */}
       <div className="stat-card" style={{ borderLeft: '4px solid #059669', marginBottom: '1.5rem' }}>
-        <div className="stat-icon">💰</div>
+        <div className="stat-icon"><i className="fa-solid fa-sack-dollar" style={{ color: '#059669' }} /></div>
         <div>
           <p className="stat-label">Total Revenue {(filterMethod || filterStatus || search) ? '(filtered)' : ''}</p>
           <h3 className="stat-value">RWF {totalRevenue.toFixed(0)}</h3>
@@ -95,7 +95,7 @@ const Payments = () => {
 
       {/* Filters */}
       <div className="menu-filters" style={{ marginBottom: '0.75rem' }}>
-        <input placeholder="🔍 Search by order ID or transaction ID..." value={search} onChange={e => setSearch(e.target.value)} className="menu-search" />
+        <input placeholder="Search by order ID or transaction ID..." value={search} onChange={e => setSearch(e.target.value)} className="menu-search" />
         <select value={filterMethod} onChange={e => setFilterMethod(e.target.value)}>
           <option value="">All Methods</option>
           <option value="cash">Cash</option>
@@ -127,12 +127,12 @@ const Payments = () => {
             </div>
             <div className="pay-card-amount">RWF {parseFloat(p.amount).toFixed(0)}</div>
             <div className="pay-card-meta">
-              <span>{methodIcon[p.payment_method]} {p.payment_method}</span>
-              {p.transaction_id && <span>🔖 {p.transaction_id}</span>}
-              <span>📅 {new Date(p.created_at).toLocaleDateString()}</span>
+              <span><i className={`fa-solid ${methodIcon[p.payment_method]}`} style={{ marginRight: '0.3rem' }} />{p.payment_method}</span>
+              {p.transaction_id && <span><i className="fa-solid fa-tag" style={{ marginRight: '0.3rem' }} />{p.transaction_id}</span>}
+              <span><i className="fa-solid fa-calendar" style={{ marginRight: '0.3rem' }} />{new Date(p.created_at).toLocaleDateString()}</span>
             </div>
             {user?.role === 'admin' && (
-              <button className="btn-danger btn-sm" style={{ marginTop: '0.5rem' }} onClick={() => handleDelete(p.id)}>🗑 Delete</button>
+              <button className="btn-danger btn-sm" style={{ marginTop: '0.5rem' }} onClick={() => handleDelete(p.id)}><i className="fa-solid fa-trash" /> Delete</button>
             )}
           </div>
         ))}
@@ -155,7 +155,7 @@ const Payments = () => {
                 <td>{p.transaction_id || '—'}</td>
                 <td>{new Date(p.created_at).toLocaleDateString()}</td>
                 {user?.role === 'admin' && (
-                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(p.id)}>🗑</button></td>
+                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(p.id)}><i className="fa-solid fa-trash" /></button></td>
                 )}
               </tr>
             ))}

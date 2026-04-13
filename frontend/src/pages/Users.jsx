@@ -11,11 +11,11 @@ const roleBadgeColor = {
 };
 
 const PERM_LABELS = {
-  dashboard: '📊 Dashboard', tables: '🪑 Tables', menu: '🍽️ Menu',
-  orders: '📦 Orders', reservations: '📅 Reservations', payments: '💳 Payments',
-  users: '👥 Users', deliveries: '🚚 Deliveries', announcements: '📢 Announcements',
-  reports: '📈 Reports', reserve: '📅 Make Reservation', 'my-reservations': '📋 My Reservations',
-  'my-orders': '🛒 My Orders', 'my-deliveries': '🚚 My Deliveries',
+  dashboard: 'Dashboard', tables: 'Tables', menu: 'Menu',
+  orders: 'Orders', reservations: 'Reservations', payments: 'Payments',
+  users: 'Users', deliveries: 'Deliveries', announcements: 'Announcements',
+  reports: 'Reports', reserve: 'Make Reservation', 'my-reservations': 'My Reservations',
+  'my-orders': 'My Orders', 'my-deliveries': 'My Deliveries',
 };
 
 const STAFF_PERMS = ['dashboard','tables','menu','orders','reservations','payments','users','deliveries','announcements','reports'];
@@ -147,16 +147,16 @@ const Users = () => {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">👥 User Management</h1>
+        <h1 className="page-title">User Management</h1>
         {activeTab === 'users' && (
-          <button className="btn-primary" onClick={() => { closeForm(); setShowForm(true); }}>➕ Add User</button>
+          <button className="btn-primary" onClick={() => { closeForm(); setShowForm(true); }}><i className="fa-solid fa-user-plus" /> Add User</button>
         )}
       </div>
 
       {/* Main tabs */}
       <div className="tabs" style={{ marginBottom: '1.5rem' }}>
         <button className={`tab ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
-          👥 Users ({users.length})
+          <i className="fa-solid fa-users" style={{ marginRight: '0.4rem' }} />Users ({users.length})
         </button>
         <button className={`tab ${activeTab === 'permissions' ? 'active' : ''}`} onClick={() => setActiveTab('permissions')}>
           🔐 Role Permissions
@@ -214,7 +214,7 @@ const Users = () => {
                   <td>
                     <div className="um-actions">
                       <button className="um-btn-edit" onClick={() => openEdit(user)}>✎ Edit</button>
-                      <button className="um-btn-reset" onClick={() => setResetUser(user)}>🔐 Reset</button>
+                      <button className="um-btn-reset" onClick={() => setResetUser(user)}><i className="fa-solid fa-key" /> Reset</button>
                       <button className="um-btn-delete" onClick={() => handleDelete(user.id)}>🗑</button>
                     </div>
                   </td>
@@ -248,7 +248,7 @@ const Users = () => {
               </div>
               <div className="um-card-actions">
                 <button className="um-btn-edit" onClick={() => openEdit(user)}>✎ Edit</button>
-                <button className="um-btn-reset" onClick={() => setResetUser(user)}>🔐 Reset Pass</button>
+                <button className="um-btn-reset" onClick={() => setResetUser(user)}><i className="fa-solid fa-key" /> Reset Pass</button>
                 <button className="um-btn-delete" onClick={() => handleDelete(user.id)}>🗑 Delete</button>
               </div>
             </div>
@@ -317,7 +317,7 @@ const Users = () => {
       {showForm && (
         <div className="modal-overlay" onClick={closeForm}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2>{editingId ? '✎ Edit User' : '➕ Create User'}</h2>
+            <h2>{editingId ? <><i className="fa-solid fa-pen" /> Edit User</> : <><i className="fa-solid fa-user-plus" /> Create User</>}</h2>
             <form onSubmit={handleSubmit}>
               <div className="um-form-field">
                 <label>Username</label>

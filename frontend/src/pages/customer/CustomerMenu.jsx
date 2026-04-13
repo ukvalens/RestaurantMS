@@ -88,14 +88,14 @@ const CustomerMenu = () => {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">🍽️ Our Menu</h1>
+        <h1 className="page-title">Our Menu</h1>
         <button className="btn-primary" onClick={() => setShowCart(true)} style={{ position: 'relative' }}>
-          🛒 Cart {cartCount > 0 && <span className="role-badge" style={{ marginLeft: 4 }}>{cartCount}</span>}
+          <i className="fa-solid fa-cart-shopping" style={{ marginRight: '0.4rem' }} />Cart {cartCount > 0 && <span className="role-badge" style={{ marginLeft: 4 }}>{cartCount}</span>}
         </button>
       </div>
 
       <div className="menu-filters">
-        <input placeholder="🔍 Search by name or description..." value={search}
+        <input placeholder="Search by name or description..." value={search}
           onChange={e => handleSearchChange(e.target.value)} className="menu-search" />
         <select value={filterCategory} onChange={e => handleCatChange(e.target.value)}>
           <option value="">All Categories</option>
@@ -127,7 +127,7 @@ const CustomerMenu = () => {
                 </div>
                 <div className="btn-group mt-1">
                   {item.image_url && (
-                    <button className="btn-secondary btn-sm" style={{ flexShrink: 0 }} onClick={() => setViewImage(item.image_url)}>🖼 View Image</button>
+                    <button className="btn-secondary btn-sm" style={{ flexShrink: 0 }} onClick={() => setViewImage(item.image_url)}><i className="fa-solid fa-image" /> View Image</button>
                   )}
                   <button className="btn-primary btn-sm" style={{ flex: 1, minWidth: 0 }} onClick={() => addToCart(item)}>+ Add to Cart</button>
                 </div>
@@ -155,7 +155,7 @@ const CustomerMenu = () => {
             onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 600 }}>Item Image</span>
-              <button className="btn-secondary btn-sm" onClick={() => setViewImage(null)}>✕ Close</button>
+              <button className="btn-secondary btn-sm" onClick={() => setViewImage(null)}><i className="fa-solid fa-xmark" /> Close</button>
             </div>
             <img src={viewImage} alt="menu item" style={{ maxWidth: '70vw', maxHeight: '70vh', objectFit: 'contain', borderRadius: 8 }} />
           </div>
@@ -168,8 +168,8 @@ const CustomerMenu = () => {
           <div style={{ flex: 1, background: 'rgba(0,0,0,0.4)' }} onClick={() => setShowCart(false)} />
           <div style={{ width: 'min(420px, 100vw)', background: 'white', display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 20px rgba(0,0,0,0.15)', overflowY: 'auto', overflowX: 'hidden' }}>
             <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.1rem' }}>🛒 Your Cart</h2>
-              <button className="btn-secondary btn-sm" onClick={() => setShowCart(false)}>✕ Close</button>
+              <h2 style={{ fontSize: '1.1rem' }}><i className="fa-solid fa-cart-shopping" style={{ marginRight: '0.4rem' }} />Your Cart</h2>
+              <button className="btn-secondary btn-sm" onClick={() => setShowCart(false)}><i className="fa-solid fa-xmark" /> Close</button>
             </div>
 
             <div style={{ flex: 1, padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -179,7 +179,7 @@ const CustomerMenu = () => {
                 <div key={c.id} style={{ borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
                     <span style={{ fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-                    <button className="btn-danger btn-sm" style={{ flexShrink: 0 }} onClick={() => removeFromCart(c.id)}>✕</button>
+                    <button className="btn-danger btn-sm" style={{ flexShrink: 0 }} onClick={() => removeFromCart(c.id)}><i className="fa-solid fa-xmark" /></button>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
                     <button className="btn-secondary btn-sm" onClick={() => updateQty(c.id, c.qty - 1)}>−</button>
@@ -208,9 +208,9 @@ const CustomerMenu = () => {
                   </select>
                 </div>
                 <button className="btn-primary" onClick={handlePlaceOrder} disabled={placing}>
-                  {placing ? 'Placing...' : '✅ Place Order'}
+                  {placing ? 'Placing...' : <><i className="fa-solid fa-circle-check" style={{ marginRight: '0.4rem' }} />Place Order</>}
                 </button>
-                <button className="btn-danger btn-sm" onClick={() => setCart([])}>🗑 Clear Cart</button>
+                <button className="btn-danger btn-sm" onClick={() => setCart([])}><i className="fa-solid fa-trash" style={{ marginRight: '0.3rem' }} />Clear Cart</button>
               </div>
             )}
           </div>

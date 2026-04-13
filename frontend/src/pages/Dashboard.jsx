@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 const StatCard = ({ label, value, icon, color }) => (
   <div className="stat-card" style={{ borderLeft: `4px solid ${color}` }}>
-    <div className="stat-icon">{icon}</div>
+    <div className="stat-icon"><i className={`fa-solid ${icon}`} style={{ color }} /></div>
     <div>
       <p className="stat-label">{label}</p>
       <h3 className="stat-value">{value}</h3>
@@ -21,23 +21,14 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const [tables, orders, reservations] = await Promise.all([
-          api.get('/tables'),
-          api.get('/orders'),
-          api.get('/reservations'),
+          api.get('/tables'), api.get('/orders'), api.get('/reservations'),
         ]);
-
         let paymentsCount = 0;
         if (['admin', 'manager'].includes(user?.role)) {
           const payments = await api.get('/payments');
           paymentsCount = payments.data.length;
         }
-
-        setStats({
-          tables: tables.data.length,
-          orders: orders.data.length,
-          reservations: reservations.data.length,
-          payments: paymentsCount,
-        });
+        setStats({ tables: tables.data.length, orders: orders.data.length, reservations: reservations.data.length, payments: paymentsCount });
         setRecentOrders(orders.data.slice(0, 5));
       } catch {}
     };
@@ -49,16 +40,14 @@ const Dashboard = () => {
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
         <h1 className="page-title">Dashboard</h1>
       </div>
-
       <div className="stats-grid">
-        <StatCard label="Total Tables" value={stats.tables} icon="🪑" color="#4f46e5" />
-        <StatCard label="Total Orders" value={stats.orders} icon="📋" color="#059669" />
-        <StatCard label="Reservations" value={stats.reservations} icon="📅" color="#d97706" />
+        <StatCard label="Total Tables"  value={stats.tables}       icon="fa-table-cells"    color="#4f46e5" />
+        <StatCard label="Total Orders"  value={stats.orders}       icon="fa-receipt"        color="#059669" />
+        <StatCard label="Reservations"  value={stats.reservations} icon="fa-calendar-check" color="#d97706" />
         {['admin', 'manager'].includes(user?.role) && (
-          <StatCard label="Payments" value={stats.payments} icon="💳" color="#dc2626" />
+          <StatCard label="Payments" value={stats.payments} icon="fa-credit-card" color="#dc2626" />
         )}
       </div>
-
       <div className="card">
         <h2>Recent Orders</h2>
         {recentOrders.length === 0 ? (
@@ -66,9 +55,7 @@ const Dashboard = () => {
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table className="data-table">
-              <thead>
-                <tr><th>ID</th><th>Table</th><th>Waiter</th><th>Amount</th><th>Status</th></tr>
-              </thead>
+              <thead><tr><th>ID</th><th>Table</th><th>Waiter</th><th>Amount</th><th>Status</th></tr></thead>
               <tbody>
                 {recentOrders.map(o => (
                   <tr key={o.id}>

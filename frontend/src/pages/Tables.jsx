@@ -79,7 +79,7 @@ const Tables = () => {
       )}
 
       <div className="menu-filters">
-        <input placeholder="🔍 Search by table number or capacity..." value={search}
+        <input placeholder="Search by table number or capacity..." value={search}
           onChange={e => setSearch(e.target.value)} className="menu-search" />
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">All Status</option>
@@ -107,7 +107,7 @@ const Tables = () => {
               </select>
             )}
             {user?.role === 'admin' && (
-              <button className="btn-danger btn-sm" style={{ marginTop: '0.5rem', width: '100%' }} onClick={() => handleDelete(t.id)}>🗑 Delete</button>
+              <button className="btn-danger btn-sm" style={{ marginTop: '0.5rem', width: '100%' }} onClick={() => handleDelete(t.id)}><i className="fa-solid fa-trash" /> Delete</button>
             )}
           </div>
         ))}

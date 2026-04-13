@@ -189,8 +189,7 @@ const Menu = () => {
       {activeTab === 'items' && (
         <>
           <div className="menu-filters">
-            <input
-              placeholder="🔍 Search by name or description..."
+            <input placeholder="Search by name or description..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="menu-search"
@@ -205,7 +204,7 @@ const Menu = () => {
               <option value="unavailable">Unavailable</option>
             </select>
             {(search || filterCategory || filterAvailability) && (
-              <button className="btn-secondary btn-sm" onClick={() => { setSearch(''); setFilterCategory(''); setFilterAvailability(''); }}>✕ Clear</button>
+              <button className="btn-secondary btn-sm" onClick={() => { setSearch(''); setFilterCategory(''); setFilterAvailability(''); }}><i className="fa-solid fa-xmark" /> Clear</button>
             )}
           </div>
           <p className="menu-count">{filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''} found</p>
@@ -226,17 +225,17 @@ const Menu = () => {
                   </span>
                 </div>
               {item.image_url && (
-                  <button className="btn-secondary btn-sm" onClick={() => setViewImage(item.image_url)}>🖼 View Image</button>
+                  <button className="btn-secondary btn-sm" onClick={() => setViewImage(item.image_url)}><i className="fa-solid fa-image" /> View Image</button>
                 )}
                 {canManage && (
                   <div className="btn-group mt-1">
                     <label className="btn-secondary btn-sm" style={{ cursor: 'pointer', padding: '0.35rem 0.75rem', borderRadius: 8, border: '1px solid var(--border)', fontSize: '0.8rem', fontWeight: 500 }}>
-                      {uploadingId === item.id ? 'Uploading...' : '📷 Upload Image'}
+                      {uploadingId === item.id ? 'Uploading...' : <><i className="fa-solid fa-camera" /> Upload Image</>}
                       <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleImageUpload(e, item.id)} />
                     </label>
                     <button className="btn-secondary btn-sm" onClick={() => startEdit(item)}>Edit</button>
                     <button className={`btn-sm ${item.is_available ? 'btn-danger' : 'btn-secondary'}`} onClick={() => handleToggleAvailability(item)}>
-                      {item.is_available ? '🔴 Disable' : '🟢 Enable'}
+                      {item.is_available ? <><i className="fa-solid fa-circle-xmark" /> Disable</> : <><i className="fa-solid fa-circle-check" /> Enable</>}
                     </button>
                     <button className="btn-danger btn-sm" onClick={() => handleDelete(item.id)}>Delete</button>
                   </div>
@@ -297,7 +296,7 @@ const Menu = () => {
             onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 600 }}>Item Image</span>
-              <button className="btn-secondary btn-sm" onClick={() => setViewImage(null)}>✕ Close</button>
+              <button className="btn-secondary btn-sm" onClick={() => setViewImage(null)}><i className="fa-solid fa-xmark" /> Close</button>
             </div>
             <img src={viewImage} alt="menu item" style={{ maxWidth: '70vw', maxHeight: '70vh', objectFit: 'contain', borderRadius: 8 }} onError={e => e.target.src = ''} />
           </div>

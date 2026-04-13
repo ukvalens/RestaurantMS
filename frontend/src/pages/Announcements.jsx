@@ -5,8 +5,8 @@ import { useNotifications } from '../context/NotificationContext';
 import toast from 'react-hot-toast';
 
 const PRIORITY_COLORS = { urgent: '#e53e3e', normal: '#4f46e5', info: '#3182ce' };
-const PRIORITY_BG     = { urgent: '#fff5f5', normal: '#f5f3ff', info:  '#ebf8ff' };
-const PRIORITY_ICON   = { urgent: '🔴', normal: '🟢', info: '🔵' };
+const PRIORITY_BG     = { urgent: '#fff5f5', normal: '#f5f3ff', info: '#ebf8ff' };
+const PRIORITY_ICON   = { urgent: 'fa-circle-exclamation', normal: 'fa-circle-info', info: 'fa-circle-dot' };
 
 const timeAgo = (date) => {
   const s = Math.floor((Date.now() - new Date(date)) / 1000);
@@ -86,7 +86,6 @@ const Announcements = () => {
     } catch { toast.error('Failed to delete reply'); }
   };
 
-  // Sort: urgent first, then by date desc
   const sorted = [...items].sort((a, b) => {
     const p = { urgent: 0, info: 1, normal: 2 };
     if (p[a.priority] !== p[b.priority]) return p[a.priority] - p[b.priority];
@@ -98,15 +97,16 @@ const Announcements = () => {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">📢 Announcements</h1>
+        <h1 className="page-title">
+          <i className="fa-solid fa-bullhorn" style={{ marginRight: '0.5rem' }} />Announcements
+        </h1>
         {canManage && (
           <button className="btn-primary" onClick={() => setShowForm(v => !v)}>
-            {showForm ? 'Cancel' : '+ New'}
+            {showForm ? 'Cancel' : <><i className="fa-solid fa-plus" style={{ marginRight: '0.4rem' }} />New</>}
           </button>
         )}
       </div>
 
-      {/* New announcement form */}
       {canManage && showForm && (
         <div className="card" style={{ marginBottom: '1.5rem' }}>
           <h3 style={{ marginBottom: '1rem', fontSize: '1rem', fontWeight: 700 }}>New Announcement</h3>
@@ -115,9 +115,9 @@ const Announcements = () => {
             <textarea placeholder="Message..." rows={4} value={form.message}
               onChange={e => setForm({ ...form, message: e.target.value })} required style={{ resize: 'vertical' }} />
             <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}>
-              <option value="normal">🟢 Normal</option>
-              <option value="info">🔵 Info</option>
-              <option value="urgent">🔴 Urgent</option>
+              <option value="normal">Normal</option>
+              <option value="info">Info</option>
+              <option value="urgent">Urgent</option>
             </select>
             <button type="submit" className="btn-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
               {loading ? 'Posting...' : 'Post Announcement'}
@@ -126,66 +126,68 @@ const Announcements = () => {
         </div>
       )}
 
-      {/* Count + show all toggle */}
       {items.length > 0 && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <p className="menu-count">{items.length} announcement{items.length !== 1 ? 's' : ''}</p>
           {items.length > 3 && (
             <button className="btn-secondary btn-sm" onClick={() => setShowAll(v => !v)}>
-              {showAll ? '▲ Show Less' : `▼ Show All (${items.length})`}
+              <i className={`fa-solid fa-chevron-${showAll ? 'up' : 'down'}`} style={{ marginRight: '0.3rem' }} />
+              {showAll ? 'Show Less' : `Show All (${items.length})`}
             </button>
           )}
         </div>
       )}
 
       {items.length === 0 ? (
-        <p className="no-results">📭 No announcements yet.</p>
+        <p className="no-results"><i className="fa-solid fa-inbox" style={{ marginRight: '0.4rem' }} />No announcements yet.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {displayed.map((item, idx) => {
-            const color      = PRIORITY_COLORS[item.priority] || '#4f46e5';
-            const bg         = PRIORITY_BG[item.priority]     || '#f5f3ff';
-            const icon       = PRIORITY_ICON[item.priority]   || '📢';
+            const color       = PRIORITY_COLORS[item.priority] || '#4f46e5';
+            const bg          = PRIORITY_BG[item.priority]     || '#f5f3ff';
+            const iconClass   = PRIORITY_ICON[item.priority]   || 'fa-bullhorn';
             const itemReplies = replies[item.id] || [];
-            const isOpen     = openReplies[item.id];
-            const isTop      = idx < 3 && !showAll;
+            const isOpen      = openReplies[item.id];
+            const isTop       = idx < 3 && !showAll;
 
             return (
               <div key={item.id} className="ann-card" style={{ borderLeft: `4px solid ${color}`, background: bg }}>
-                {/* Top badge for first 3 */}
                 {isTop && idx === 0 && (
-                  <div className="ann-top-badge" style={{ background: color }}>📌 Latest</div>
+                  <div className="ann-top-badge" style={{ background: color }}>
+                    <i className="fa-solid fa-thumbtack" style={{ marginRight: '0.3rem' }} />Latest
+                  </div>
                 )}
 
-                {/* Card header */}
                 <div className="ann-card-header">
                   <div className="ann-card-title-row">
-                    <span className="ann-priority-icon">{icon}</span>
+                    <span className="ann-priority-icon">
+                      <i className={`fa-solid ${iconClass}`} style={{ color }} />
+                    </span>
                     <h3 className="ann-card-title">{item.title}</h3>
                     <span className="ann-priority-badge" style={{ color, background: color + '18', border: `1px solid ${color}30` }}>
                       {item.priority}
                     </span>
                   </div>
                   <div className="ann-card-meta">
-                    <span>👤 <strong>{item.created_by_name}</strong></span>
-                    <span>🕐 {timeAgo(item.created_at)}</span>
+                    <span><i className="fa-solid fa-user" style={{ marginRight: '0.3rem' }} /><strong>{item.created_by_name}</strong></span>
+                    <span><i className="fa-solid fa-clock" style={{ marginRight: '0.3rem' }} />{timeAgo(item.created_at)}</span>
                   </div>
                 </div>
 
-                {/* Message */}
                 <p className="ann-card-message">{item.message}</p>
 
-                {/* Footer */}
                 <div className="ann-card-footer">
                   <button className="btn-secondary btn-sm" onClick={() => toggleReplies(item.id)}>
-                    💬 {isOpen ? 'Hide' : 'Reply'}{itemReplies.length > 0 ? ` (${itemReplies.length})` : ''}
+                    <i className="fa-solid fa-comments" style={{ marginRight: '0.3rem' }} />
+                    {isOpen ? 'Hide' : 'Reply'}{itemReplies.length > 0 ? ` (${itemReplies.length})` : ''}
                   </button>
                   {canManage && (
-                    <button className="btn-danger btn-sm" onClick={() => handleDelete(item.id)}>🗑 Delete</button>
+                    <button className="btn-danger btn-sm" onClick={() => handleDelete(item.id)}>
+                      <i className="fa-solid fa-trash" style={{ marginRight: '0.3rem' }} />Delete
+                    </button>
                   )}
                 </div>
 
-                {/* Replies */}
                 {isOpen && (
                   <div className="ann-replies-section">
                     {itemReplies.length === 0 ? (
@@ -203,7 +205,9 @@ const Announcements = () => {
                               <p className="ann-reply-text">{reply.message}</p>
                             </div>
                             {(canManage || reply.user_id === user?.id) && (
-                              <button className="ann-reply-del" onClick={() => deleteReply(item.id, reply.id)}>✕</button>
+                              <button className="ann-reply-del" onClick={() => deleteReply(item.id, reply.id)}>
+                                <i className="fa-solid fa-xmark" />
+                              </button>
                             )}
                           </div>
                         ))}

@@ -4,7 +4,7 @@ import api from '../../api/axios';
 
 const StatCard = ({ label, value, icon, color }) => (
   <div className="stat-card" style={{ borderLeft: `4px solid ${color}` }}>
-    <div className="stat-icon">{icon}</div>
+    <div className="stat-icon"><i className={`fa-solid ${icon}`} style={{ color }} /></div>
     <div>
       <p className="stat-label">{label}</p>
       <h3 className="stat-value">{value}</h3>
@@ -24,23 +24,21 @@ const CustomerDashboard = () => {
     }).catch(() => {});
   }, [user]);
 
-  const total = reservations.length;
-  const pending = reservations.filter(r => r.status === 'pending').length;
+  const total     = reservations.length;
+  const pending   = reservations.filter(r => r.status === 'pending').length;
   const confirmed = reservations.filter(r => r.status === 'confirmed').length;
   const completed = reservations.filter(r => r.status === 'completed').length;
-  const recent = reservations.slice(0, 5);
+  const recent    = reservations.slice(0, 5);
 
   return (
     <div className="page">
-      <h1 className="page-title">📊 Dashboard</h1>
-
+      <h1 className="page-title">Dashboard</h1>
       <div className="stats-grid">
-        <StatCard label="Total Reservations" value={total} icon="📅" color="#4f46e5" />
-        <StatCard label="Pending" value={pending} icon="⏳" color="#d97706" />
-        <StatCard label="Confirmed" value={confirmed} icon="✅" color="#059669" />
-        <StatCard label="Completed" value={completed} icon="🏁" color="#dc2626" />
+        <StatCard label="Total Reservations" value={total}     icon="fa-calendar-check" color="#4f46e5" />
+        <StatCard label="Pending"            value={pending}   icon="fa-clock"          color="#d97706" />
+        <StatCard label="Confirmed"          value={confirmed} icon="fa-circle-check"   color="#059669" />
+        <StatCard label="Completed"          value={completed} icon="fa-flag-checkered" color="#dc2626" />
       </div>
-
       <div className="card">
         <h2>Recent Reservations</h2>
         {recent.length === 0 ? (
@@ -48,9 +46,7 @@ const CustomerDashboard = () => {
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table className="data-table">
-              <thead>
-                <tr><th>ID</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th></tr>
-              </thead>
+              <thead><tr><th>ID</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th></tr></thead>
               <tbody>
                 {recent.map(r => (
                   <tr key={r.id}>

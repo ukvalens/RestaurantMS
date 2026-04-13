@@ -42,14 +42,14 @@ const MyReservations = () => {
 
   return (
     <div className="page">
-      <h1 className="page-title">📋 My Activity</h1>
+      <h1 className="page-title">My Activity</h1>
 
       <div className="tabs">
         <button className={tab === 'reservations' ? 'tab active' : 'tab'} onClick={() => setTab('reservations')}>
-          📅 Reservations ({reservations.length})
+          <i className="fa-solid fa-calendar-check" style={{ marginRight: '0.4rem' }} />Reservations ({reservations.length})
         </button>
         <button className={tab === 'orders' ? 'tab active' : 'tab'} onClick={() => setTab('orders')}>
-          🛒 Orders ({orders.length})
+          <i className="fa-solid fa-bag-shopping" style={{ marginRight: '0.4rem' }} />Orders ({orders.length})
         </button>
       </div>
 
@@ -57,7 +57,7 @@ const MyReservations = () => {
       {tab === 'reservations' && (
         <div className="card">
           <div className="menu-filters" style={{ marginBottom: '1rem' }}>
-            <input placeholder="🔍 Search by date or table..." value={resSearch}
+            <input placeholder="Search by date or table..." value={resSearch}
               onChange={e => setResSearch(e.target.value)} className="menu-search" />
             <select value={resStatus} onChange={e => setResStatus(e.target.value)}>
               <option value="">All Status</option>
@@ -99,7 +99,7 @@ const MyReservations = () => {
       {tab === 'orders' && (
         <div className="card">
           <div className="menu-filters" style={{ marginBottom: '1rem' }}>
-            <input placeholder="🔍 Search by order ID or table..." value={ordSearch}
+            <input placeholder="Search by order ID or table..." value={ordSearch}
               onChange={e => setOrdSearch(e.target.value)} className="menu-search" />
             <select value={ordStatus} onChange={e => setOrdStatus(e.target.value)}>
               <option value="">All Status</option>

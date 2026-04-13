@@ -67,7 +67,7 @@ const Reservations = () => {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">📅 Reservations</h1>
+        <h1 className="page-title">Reservations</h1>
         <button className="btn-primary" onClick={() => setShowForm(!showForm)}>+ New Reservation</button>
       </div>
 
@@ -96,7 +96,7 @@ const Reservations = () => {
 
       {/* Filters */}
       <div className="menu-filters" style={{ marginBottom: '0.75rem' }}>
-        <input placeholder="🔍 Search by name, phone or email..." value={search} onChange={e => setSearch(e.target.value)} className="menu-search" />
+        <input placeholder="Search by name, phone or email..." value={search} onChange={e => setSearch(e.target.value)} className="menu-search" />
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">All Status</option>
           {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -120,19 +120,19 @@ const Reservations = () => {
               <span className={`badge badge-${r.status}`}>{r.status}</span>
             </div>
             <div className="rs-card-meta">
-              <span>📞 {r.customer_phone}</span>
-              <span>🪑 Table {r.table_number}</span>
-              <span>👥 Party of {r.party_size}</span>
-              <span>📅 {r.reservation_date?.split('T')[0]}</span>
-              <span>🕐 {r.reservation_time}</span>
+              <span><i className="fa-solid fa-phone" style={{ marginRight: '0.3rem' }} />{r.customer_phone}</span>
+              <span><i className="fa-solid fa-chair" style={{ marginRight: '0.3rem' }} />Table {r.table_number}</span>
+              <span><i className="fa-solid fa-users" style={{ marginRight: '0.3rem' }} />Party of {r.party_size}</span>
+              <span><i className="fa-solid fa-calendar" style={{ marginRight: '0.3rem' }} />{r.reservation_date?.split('T')[0]}</span>
+              <span><i className="fa-solid fa-clock" style={{ marginRight: '0.3rem' }} />{r.reservation_time}</span>
             </div>
             {canManage && (
               <div className="rs-card-actions">
                 <select value={r.status} onChange={e => updateStatus(r.id, e.target.value)} className="status-select">
                   {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
-                <button className="btn-secondary btn-sm" onClick={() => setEditReservation({ ...r, reservation_date: r.reservation_date?.split('T')[0] })}>✎ Edit</button>
-                <button className="btn-danger btn-sm" onClick={() => handleDelete(r.id)}>🗑</button>
+                <button className="btn-secondary btn-sm" onClick={() => setEditReservation({ ...r, reservation_date: r.reservation_date?.split('T')[0] })}><i className="fa-solid fa-pen" /> Edit</button>
+                <button className="btn-danger btn-sm" onClick={() => handleDelete(r.id)}><i className="fa-solid fa-trash" /></button>
               </div>
             )}
           </div>
@@ -167,7 +167,7 @@ const Reservations = () => {
                   <td>
                     <div className="btn-group">
                       <button className="btn-secondary btn-sm" onClick={() => setEditReservation({ ...r, reservation_date: r.reservation_date?.split('T')[0] })}>Edit</button>
-                      <button className="btn-danger btn-sm" onClick={() => handleDelete(r.id)}>🗑</button>
+                      <button className="btn-danger btn-sm" onClick={() => handleDelete(r.id)}><i className="fa-solid fa-trash" /></button>
                     </div>
                   </td>
                 )}

@@ -105,7 +105,7 @@ const Deliveries = () => {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">🚚 Deliveries</h1>
+        <h1 className="page-title">Deliveries</h1>
         {!isDriver && (
           <button className="btn-primary" onClick={() => setShowForm(!showForm)}>+ New Delivery</button>
         )}
@@ -139,7 +139,7 @@ const Deliveries = () => {
 
       {/* Filters */}
       <div className="menu-filters" style={{ marginBottom: '0.75rem' }}>
-        <input placeholder="🔍 Search by ID, address, driver or customer..."
+        <input placeholder="Search by ID, address, driver or customer..."
           value={search} onChange={e => setSearch(e.target.value)} className="menu-search" />
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">All Status</option>
@@ -161,13 +161,13 @@ const Deliveries = () => {
               <span className="dv-card-id">#{d.id}</span>
               <span className={`badge badge-delivery-${d.status}`}>{d.status.replace(/_/g, ' ')}</span>
             </div>
-            <p className="dv-card-address">📍 {d.delivery_address}</p>
+            <p className="dv-card-address"><i className="fa-solid fa-location-dot" style={{ marginRight: '0.3rem' }} />{d.delivery_address}</p>
             <div className="dv-card-meta">
-              <span>👤 {d.customer_name || '—'}</span>
-              <span>🚗 {d.driver_name || <em style={{ color: 'var(--text-muted)' }}>Unassigned</em>}</span>
-              <span>💰 RWF {parseFloat(d.delivery_fee || 0).toFixed(0)}</span>
+              <span><i className="fa-solid fa-user" style={{ marginRight: '0.3rem' }} />{d.customer_name || '—'}</span>
+              <span><i className="fa-solid fa-car" style={{ marginRight: '0.3rem' }} />{d.driver_name || <em style={{ color: 'var(--text-muted)' }}>Unassigned</em>}</span>
+              <span><i className="fa-solid fa-coins" style={{ marginRight: '0.3rem' }} />RWF {parseFloat(d.delivery_fee || 0).toFixed(0)}</span>
             </div>
-            {d.notes && <p className="dv-card-notes">📝 {d.notes}</p>}
+            {d.notes && <p className="dv-card-notes"><i className="fa-solid fa-note-sticky" style={{ marginRight: '0.3rem' }} />{d.notes}</p>}
             <div className="dv-card-actions">
               {canManage && (
                 <select value={d.driver_id || ''} onChange={e => assignDriver(d.id, e.target.value)} className="status-select">
@@ -180,7 +180,7 @@ const Deliveries = () => {
               </select>
               {canManage && <FeeInput value={d.delivery_fee} onSave={fee => updateFee(d.id, fee)} />}
               {canManage && (
-                <button className="btn-danger btn-sm" onClick={() => handleDelete(d.id)}>🗑 Delete</button>
+                <button className="btn-danger btn-sm" onClick={() => handleDelete(d.id)}><i className="fa-solid fa-trash" /> Delete</button>
               )}
             </div>
           </div>
@@ -226,7 +226,7 @@ const Deliveries = () => {
                   </select>
                 </td>
                 {canManage && (
-                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(d.id)}>🗑</button></td>
+                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(d.id)}><i className="fa-solid fa-trash" /></button></td>
                 )}
               </tr>
             ))}

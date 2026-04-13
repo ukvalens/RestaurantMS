@@ -69,7 +69,7 @@ const Orders = () => {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">📋 Orders</h1>
+        <h1 className="page-title">Orders</h1>
         {['admin', 'manager', 'waiter'].includes(user?.role) && (
           <button className="btn-primary" onClick={() => setShowForm(!showForm)}>+ New Order</button>
         )}
@@ -94,7 +94,7 @@ const Orders = () => {
                 </select>
                 <input type="number" min="1" placeholder="Qty" value={item.quantity} onChange={e => updateItem(i, 'quantity', e.target.value)} required />
                 <input placeholder="Special instructions" value={item.special_instructions} onChange={e => updateItem(i, 'special_instructions', e.target.value)} />
-                {form.items.length > 1 && <button type="button" className="btn-danger btn-sm" onClick={() => removeItem(i)}>✕</button>}
+                {form.items.length > 1 && <button type="button" className="btn-danger btn-sm" onClick={() => removeItem(i)}><i className="fa-solid fa-xmark" /></button>}
               </div>
             ))}
             <div className="btn-group mt-1">
@@ -107,7 +107,7 @@ const Orders = () => {
 
       {/* Filters */}
       <div className="menu-filters" style={{ marginBottom: '0.75rem' }}>
-        <input placeholder="🔍 Search by order ID, table or waiter..." value={search} onChange={e => setSearch(e.target.value)} className="menu-search" />
+        <input placeholder="Search by order ID, table or waiter..." value={search} onChange={e => setSearch(e.target.value)} className="menu-search" />
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">All Status</option>
           {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -130,16 +130,16 @@ const Orders = () => {
               <span className={`badge badge-${o.status}`}>{o.status}</span>
             </div>
             <div className="ord-card-meta">
-              <span>👤 {o.waiter_name}</span>
-              <span>💰 RWF {parseFloat(o.total_amount).toFixed(0)}</span>
+              <span><i className="fa-solid fa-user" style={{ marginRight: '0.3rem' }} />{o.waiter_name}</span>
+              <span><i className="fa-solid fa-coins" style={{ marginRight: '0.3rem' }} />RWF {parseFloat(o.total_amount).toFixed(0)}</span>
             </div>
             <div className="ord-card-actions">
               <select value={o.status} onChange={e => updateStatus(o.id, e.target.value)} className="status-select">
                 {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
-              <button className="btn-secondary btn-sm" onClick={() => viewDetail(o.id)}>🔍 View</button>
+              <button className="btn-secondary btn-sm" onClick={() => viewDetail(o.id)}><i className="fa-solid fa-eye" /> View</button>
               {['admin', 'manager'].includes(user?.role) && (
-                <button className="btn-danger btn-sm" onClick={() => handleDelete(o.id)}>🗑</button>
+                <button className="btn-danger btn-sm" onClick={() => handleDelete(o.id)}><i className="fa-solid fa-trash" /></button>
               )}
             </div>
           </div>
@@ -165,9 +165,9 @@ const Orders = () => {
                     {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </td>
-                <td><button className="btn-secondary btn-sm" onClick={() => viewDetail(o.id)}>🔍 View</button></td>
+                <td><button className="btn-secondary btn-sm" onClick={() => viewDetail(o.id)}><i className="fa-solid fa-eye" /> View</button></td>
                 {['admin', 'manager'].includes(user?.role) && (
-                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(o.id)}>🗑</button></td>
+                  <td><button className="btn-danger btn-sm" onClick={() => handleDelete(o.id)}><i className="fa-solid fa-trash" /></button></td>
                 )}
               </tr>
             ))}
