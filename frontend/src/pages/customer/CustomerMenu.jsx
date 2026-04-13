@@ -166,7 +166,7 @@ const CustomerMenu = () => {
       {showCart && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}>
           <div style={{ flex: 1, background: 'rgba(0,0,0,0.4)' }} onClick={() => setShowCart(false)} />
-          <div style={{ width: 'min(420px, 100vw)', background: 'white', display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 20px rgba(0,0,0,0.15)', overflowY: 'auto' }}>
+          <div style={{ width: 'min(420px, 100vw)', background: 'white', display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 20px rgba(0,0,0,0.15)', overflowY: 'auto', overflowX: 'hidden' }}>
             <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ fontSize: '1.1rem' }}>🛒 Your Cart</h2>
               <button className="btn-secondary btn-sm" onClick={() => setShowCart(false)}>✕ Close</button>
@@ -177,19 +177,19 @@ const CustomerMenu = () => {
                 <p className="no-results">Your cart is empty.</p>
               ) : cart.map(c => (
                 <div key={c.id} style={{ borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                    <span style={{ fontWeight: 600 }}>{c.name}</span>
-                    <button className="btn-danger btn-sm" onClick={() => removeFromCart(c.id)}>✕</button>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                    <span style={{ fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
+                    <button className="btn-danger btn-sm" style={{ flexShrink: 0 }} onClick={() => removeFromCart(c.id)}>✕</button>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
                     <button className="btn-secondary btn-sm" onClick={() => updateQty(c.id, c.qty - 1)}>−</button>
                     <span style={{ minWidth: 24, textAlign: 'center' }}>{c.qty}</span>
                     <button className="btn-secondary btn-sm" onClick={() => updateQty(c.id, c.qty + 1)}>+</button>
-                    <span style={{ marginLeft: 'auto', fontWeight: 600 }}>RWF {(parseFloat(c.price) * c.qty).toFixed(0)}</span>
+                    <span style={{ marginLeft: 'auto', fontWeight: 600, flexShrink: 0 }}>RWF {(parseFloat(c.price) * c.qty).toFixed(0)}</span>
                   </div>
                   <input placeholder="Special instructions (optional)" value={c.special_instructions}
                     onChange={e => updateNote(c.id, e.target.value)}
-                    style={{ fontSize: '0.82rem', padding: '0.4rem 0.6rem' }} />
+                    style={{ fontSize: '0.82rem', padding: '0.4rem 0.6rem', width: '100%', boxSizing: 'border-box' }} />
                 </div>
               ))}
             </div>

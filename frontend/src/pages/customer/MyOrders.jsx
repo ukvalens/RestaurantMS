@@ -38,22 +38,24 @@ const MyOrders = () => {
         {filtered.length === 0 ? (
           <p className="no-results">No orders found.</p>
         ) : (
-          <table className="data-table">
-            <thead>
-              <tr><th>ID</th><th>Table</th><th>Waiter</th><th>Amount</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-              {filtered.map(o => (
-                <tr key={o.id}>
-                  <td>#{o.id}</td>
-                  <td>Table {o.table_number}</td>
-                  <td>{o.waiter_name}</td>
-                  <td>${parseFloat(o.total_amount).toFixed(2)}</td>
-                  <td><span className={`badge badge-${o.status}`}>{o.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="data-table">
+              <thead>
+                <tr><th>ID</th><th>Table</th><th>Waiter</th><th>Amount</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                {filtered.map(o => (
+                  <tr key={o.id}>
+                    <td>#{o.id}</td>
+                    <td>Table {o.table_number}</td>
+                    <td>{o.waiter_name}</td>
+                    <td>${parseFloat(o.total_amount).toFixed(2)}</td>
+                    <td><span className={`badge badge-${o.status}`}>{o.status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
