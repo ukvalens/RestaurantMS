@@ -4,8 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import toast from 'react-hot-toast';
 
-const PRIORITY_COLORS = { urgent: '#e53e3e', normal: 'var(--primary)', info: '#3182ce' };
-const PRIORITY_BG    = { urgent: '#fff5f5', normal: '#f0f0ff',          info: '#ebf8ff' };
+const PRIORITY_COLORS = { urgent: '#e53e3e', normal: '#4f46e5', info: '#3182ce' };
+const PRIORITY_BG     = { urgent: '#fff5f5', normal: '#f5f3ff', info:  '#ebf8ff' };
+const PRIORITY_ICON   = { urgent: '🔴', normal: '🟢', info: '🔵' };
 
 const timeAgo = (date) => {
   const s = Math.floor((Date.now() - new Date(date)) / 1000);
@@ -22,9 +23,10 @@ const Announcements = () => {
   const [form, setForm] = useState({ title: '', message: '', priority: 'normal' });
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [replies, setReplies] = useState({});         // { [announcementId]: reply[] }
-  const [openReplies, setOpenReplies] = useState({}); // { [announcementId]: bool }
-  const [replyText, setReplyText] = useState({});     // { [announcementId]: string }
+  const [showAll, setShowAll] = useState(false);
+  const [replies, setReplies] = useState({});
+  const [openReplies, setOpenReplies] = useState({});
+  const [replyText, setReplyText] = useState({});
   const [replyLoading, setReplyLoading] = useState({});
   const canManage = ['admin', 'manager'].includes(user?.role);
 
@@ -43,7 +45,7 @@ const Announcements = () => {
       setForm({ title: '', message: '', priority: 'normal' });
       setShowForm(false);
       loadAnnouncements();
-      fetchNotifications(); // refresh bell immediately
+      fetchNotifications();
     } catch { toast.error('Failed to post'); }
     finally { setLoading(false); }
   };
@@ -84,20 +86,30 @@ const Announcements = () => {
     } catch { toast.error('Failed to delete reply'); }
   };
 
+  // Sort: urgent first, then by date desc
+  const sorted = [...items].sort((a, b) => {
+    const p = { urgent: 0, info: 1, normal: 2 };
+    if (p[a.priority] !== p[b.priority]) return p[a.priority] - p[b.priority];
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+
+  const displayed = showAll ? sorted : sorted.slice(0, 3);
+
   return (
     <div className="page">
       <div className="page-header">
         <h1 className="page-title">📢 Announcements</h1>
         {canManage && (
           <button className="btn-primary" onClick={() => setShowForm(v => !v)}>
-            {showForm ? 'Cancel' : '+ New Announcement'}
+            {showForm ? 'Cancel' : '+ New'}
           </button>
         )}
       </div>
 
+      {/* New announcement form */}
       {canManage && showForm && (
         <div className="card" style={{ marginBottom: '1.5rem' }}>
-          <h3 style={{ marginBottom: '1rem', fontSize: '1rem' }}>New Announcement</h3>
+          <h3 style={{ marginBottom: '1rem', fontSize: '1rem', fontWeight: 700 }}>New Announcement</h3>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <input placeholder="Title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
             <textarea placeholder="Message..." rows={4} value={form.message}
@@ -114,84 +126,103 @@ const Announcements = () => {
         </div>
       )}
 
+      {/* Count + show all toggle */}
+      {items.length > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <p className="menu-count">{items.length} announcement{items.length !== 1 ? 's' : ''}</p>
+          {items.length > 3 && (
+            <button className="btn-secondary btn-sm" onClick={() => setShowAll(v => !v)}>
+              {showAll ? '▲ Show Less' : `▼ Show All (${items.length})`}
+            </button>
+          )}
+        </div>
+      )}
+
       {items.length === 0 ? (
         <p className="no-results">📭 No announcements yet.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {items.map(item => {
-            const color = PRIORITY_COLORS[item.priority] || 'var(--primary)';
-            const bg    = PRIORITY_BG[item.priority]    || '#f0f0ff';
+          {displayed.map((item, idx) => {
+            const color      = PRIORITY_COLORS[item.priority] || '#4f46e5';
+            const bg         = PRIORITY_BG[item.priority]     || '#f5f3ff';
+            const icon       = PRIORITY_ICON[item.priority]   || '📢';
             const itemReplies = replies[item.id] || [];
-            const isOpen = openReplies[item.id];
+            const isOpen     = openReplies[item.id];
+            const isTop      = idx < 3 && !showAll;
 
             return (
-              <div key={item.id} className="card" style={{ borderLeft: `4px solid ${color}`, background: bg, padding: '1.25rem' }}>
-                {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
-                      <h3 style={{ fontSize: '1rem', margin: 0 }}>{item.title}</h3>
-                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color, background: color + '20', padding: '2px 8px', borderRadius: '999px', textTransform: 'uppercase' }}>
-                        {item.priority}
-                      </span>
-                    </div>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '0.6rem' }}>
-                      By <strong>{item.created_by_name}</strong> · {timeAgo(item.created_at)}
-                    </p>
-                    <p style={{ fontSize: '0.92rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{item.message}</p>
+              <div key={item.id} className="ann-card" style={{ borderLeft: `4px solid ${color}`, background: bg }}>
+                {/* Top badge for first 3 */}
+                {isTop && idx === 0 && (
+                  <div className="ann-top-badge" style={{ background: color }}>📌 Latest</div>
+                )}
+
+                {/* Card header */}
+                <div className="ann-card-header">
+                  <div className="ann-card-title-row">
+                    <span className="ann-priority-icon">{icon}</span>
+                    <h3 className="ann-card-title">{item.title}</h3>
+                    <span className="ann-priority-badge" style={{ color, background: color + '18', border: `1px solid ${color}30` }}>
+                      {item.priority}
+                    </span>
                   </div>
-                  {canManage && (
-                    <button onClick={() => handleDelete(item.id)} className="btn-danger btn-sm" style={{ flexShrink: 0 }}>🗑</button>
-                  )}
+                  <div className="ann-card-meta">
+                    <span>👤 <strong>{item.created_by_name}</strong></span>
+                    <span>🕐 {timeAgo(item.created_at)}</span>
+                  </div>
                 </div>
 
-                {/* Replies toggle */}
-                <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
+                {/* Message */}
+                <p className="ann-card-message">{item.message}</p>
+
+                {/* Footer */}
+                <div className="ann-card-footer">
                   <button className="btn-secondary btn-sm" onClick={() => toggleReplies(item.id)}>
-                    💬 {isOpen ? 'Hide' : 'Show'} Replies {itemReplies.length > 0 ? `(${itemReplies.length})` : ''}
+                    💬 {isOpen ? 'Hide' : 'Reply'}{itemReplies.length > 0 ? ` (${itemReplies.length})` : ''}
                   </button>
-
-                  {isOpen && (
-                    <div style={{ marginTop: '0.75rem' }}>
-                      {/* Reply list */}
-                      {itemReplies.length === 0 ? (
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>No replies yet. Be the first!</p>
-                      ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                          {itemReplies.map(reply => (
-                            <div key={reply.id} className="ann-reply">
-                              <div className="ann-reply-avatar">{reply.username.charAt(0).toUpperCase()}</div>
-                              <div className="ann-reply-body">
-                                <div className="ann-reply-meta">
-                                  <strong>{reply.username}</strong>
-                                  <span>{timeAgo(reply.created_at)}</span>
-                                </div>
-                                <p className="ann-reply-text">{reply.message}</p>
-                              </div>
-                              {(canManage || reply.user_id === user?.id) && (
-                                <button className="ann-reply-del" onClick={() => deleteReply(item.id, reply.id)}>✕</button>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Reply input */}
-                      <div className="ann-reply-input">
-                        <input
-                          placeholder="Write a reply..."
-                          value={replyText[item.id] || ''}
-                          onChange={e => setReplyText(prev => ({ ...prev, [item.id]: e.target.value }))}
-                          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && submitReply(item.id)}
-                        />
-                        <button className="btn-primary btn-sm" onClick={() => submitReply(item.id)}
-                          disabled={replyLoading[item.id] || !replyText[item.id]?.trim()}>
-                          {replyLoading[item.id] ? '...' : 'Send'}
-                        </button>
-                      </div>
-                    </div>
+                  {canManage && (
+                    <button className="btn-danger btn-sm" onClick={() => handleDelete(item.id)}>🗑 Delete</button>
                   )}
                 </div>
+
+                {/* Replies */}
+                {isOpen && (
+                  <div className="ann-replies-section">
+                    {itemReplies.length === 0 ? (
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.83rem' }}>No replies yet. Be the first!</p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                        {itemReplies.map(reply => (
+                          <div key={reply.id} className="ann-reply">
+                            <div className="ann-reply-avatar">{reply.username.slice(0, 2).toUpperCase()}</div>
+                            <div className="ann-reply-body">
+                              <div className="ann-reply-meta">
+                                <strong>{reply.username}</strong>
+                                <span>{timeAgo(reply.created_at)}</span>
+                              </div>
+                              <p className="ann-reply-text">{reply.message}</p>
+                            </div>
+                            {(canManage || reply.user_id === user?.id) && (
+                              <button className="ann-reply-del" onClick={() => deleteReply(item.id, reply.id)}>✕</button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="ann-reply-input">
+                      <input
+                        placeholder="Write a reply..."
+                        value={replyText[item.id] || ''}
+                        onChange={e => setReplyText(prev => ({ ...prev, [item.id]: e.target.value }))}
+                        onKeyDown={e => e.key === 'Enter' && !e.shiftKey && submitReply(item.id)}
+                      />
+                      <button className="btn-primary btn-sm" onClick={() => submitReply(item.id)}
+                        disabled={replyLoading[item.id] || !replyText[item.id]?.trim()}>
+                        {replyLoading[item.id] ? '...' : 'Send'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
