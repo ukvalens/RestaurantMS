@@ -686,3 +686,17 @@ button { cursor: pointer; border: none; border-radius: 8px; font-size: 0.9rem; f
   .perm-role-tabs { gap: 0.35rem; }
   .perm-role-tab { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
 }
+
+/* ===== ANNOUNCEMENT REPLIES ===== */
+.ann-reply { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.6rem 0.75rem; background: white; border-radius: 10px; border: 1px solid var(--border); }
+.ann-reply-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; flex-shrink: 0; }
+.ann-reply-body { flex: 1; min-width: 0; }
+.ann-reply-meta { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem; }
+.ann-reply-meta strong { font-size: 0.82rem; }
+.ann-reply-meta span { font-size: 0.75rem; color: var(--text-muted); }
+.ann-reply-text { font-size: 0.88rem; color: var(--text); line-height: 1.5; word-break: break-word; }
+.ann-reply-del { background: none; border: none; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; padding: 0.2rem; border-radius: 4px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
+.ann-reply:hover .ann-reply-del { opacity: 1; }
+.ann-reply-del:hover { background: #fee2e2; color: var(--danger); }
+.ann-reply-input { display: flex; gap: 0.5rem; align-items: center; }
+.ann-reply-input input { flex: 1; padding: 0.5rem 0.75rem; font-size: 0.88rem; border-radius: 8px; }

@@ -641,14 +641,65 @@ r.post('/announcements', authMiddleware, roleCheck('admin', 'manager'), async (r
   try {
     await ensureAnnouncementsTable();
     if (!title || !message) return res.status(400).json({ error: 'Title and message are required' });
-    const r = await pool.query('INSERT INTO announcements (title,message,priority,created_by,created_by_name) VALUES ($1,$2,$3,$4,$5) RETURNING *', [title, message, priority, req.user.id, req.user.username]);
-    res.status(201).json(r.rows[0]);
+    const result = await pool.query('INSERT INTO announcements (title,message,priority,created_by,created_by_name) VALUES ($1,$2,$3,$4,$5) RETURNING *', [title, message, priority, req.user.id, req.user.username]);
+    res.status(201).json(result.rows[0]);
+    const icon = priority === 'urgent' ? '🔴' : priority === 'info' ? '🔵' : '📢';
+    createNotification('announcement', `${icon} ${title}`, message, 'all', '/app/announcements');
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 r.delete('/announcements/:id', authMiddleware, roleCheck('admin', 'manager'), async (req, res) => {
   try {
+    await pool.query('DELETE FROM announcement_replies WHERE announcement_id=$1', [req.params.id]);
     await pool.query('DELETE FROM announcements WHERE id=$1', [req.params.id]);
+    res.json({ message: 'Deleted' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── ANNOUNCEMENT REPLIES ──────────────────────────────────────────────────────────
+const ensureRepliesTable = () => pool.query(`
+  CREATE TABLE IF NOT EXISTS announcement_replies (
+    id SERIAL PRIMARY KEY,
+    announcement_id INTEGER NOT NULL,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    username VARCHAR(100) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+  )
+`);
+
+r.get('/announcements/:id/replies', authMiddleware, async (req, res) => {
+  try {
+    await ensureRepliesTable();
+    const result = await pool.query(
+      'SELECT * FROM announcement_replies WHERE announcement_id=$1 ORDER BY created_at ASC',
+      [req.params.id]
+    );
+    res.json(result.rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+r.post('/announcements/:id/replies', authMiddleware, async (req, res) => {
+  const { message } = req.body;
+  if (!message?.trim()) return res.status(400).json({ error: 'Message is required' });
+  try {
+    await ensureRepliesTable();
+    const result = await pool.query(
+      'INSERT INTO announcement_replies (announcement_id, user_id, username, message) VALUES ($1,$2,$3,$4) RETURNING *',
+      [req.params.id, req.user.id, req.user.username, message.trim()]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+r.delete('/announcements/:announcementId/replies/:replyId', authMiddleware, async (req, res) => {
+  try {
+    const canDelete = ['admin', 'manager'].includes(req.user.role);
+    const query = canDelete
+      ? 'DELETE FROM announcement_replies WHERE id=$1'
+      : 'DELETE FROM announcement_replies WHERE id=$1 AND user_id=$2';
+    const params = canDelete ? [req.params.replyId] : [req.params.replyId, req.user.id];
+    await pool.query(query, params);
     res.json({ message: 'Deleted' });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
