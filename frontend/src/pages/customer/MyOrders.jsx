@@ -7,6 +7,7 @@ const MyOrders = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [expandedId, setExpandedId] = useState(null);
@@ -15,10 +16,18 @@ const MyOrders = () => {
   const statuses = ['pending', 'preparing', 'ready', 'served', 'completed', 'cancelled'];
 
   useEffect(() => {
+    // Customer placed orders via cart — waiter_id is set to their own user id
     api.get('/orders').then(r => {
       setOrders(r.data.filter(o => o.waiter_id === user?.id));
     }).catch(() => {});
+
+    // Fetch all payments to check which orders are paid
+    api.get('/payments').then(r => setPayments(r.data)).catch(() => {});
   }, [user]);
+
+  // Check if an order has a completed payment
+  const isPaid = (orderId) =>
+    payments.some(p => p.order_id === orderId && p.payment_status === 'completed');
 
   const toggleDetail = async (id) => {
     if (expandedId === id) { setExpandedId(null); return; }
@@ -42,7 +51,9 @@ const MyOrders = () => {
 
   return (
     <div className="page">
-      <h1 className="page-title"><i className="fa-solid fa-bag-shopping" style={{ marginRight: '0.5rem' }} />My Orders</h1>
+      <h1 className="page-title">
+        <i className="fa-solid fa-bag-shopping" style={{ marginRight: '0.5rem' }} />My Orders
+      </h1>
 
       <div className="menu-filters" style={{ marginBottom: '1rem' }}>
         <input placeholder="Search by order ID or table..." value={search}
@@ -68,6 +79,7 @@ const MyOrders = () => {
             const step = statusStep[o.status];
             const isExpanded = expandedId === o.id;
             const detail = details[o.id];
+            const paid = isPaid(o.id);
 
             return (
               <div key={o.id} className="card" style={{ padding: '1rem' }}>
@@ -81,6 +93,7 @@ const MyOrders = () => {
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                     <span className={`badge badge-${o.status}`}>{o.status}</span>
+                    {paid && <span className="badge badge-available"><i className="fa-solid fa-circle-check" style={{ marginRight: '0.25rem' }} />Paid</span>}
                     <strong style={{ color: 'var(--primary)' }}>RWF {parseFloat(o.total_amount).toFixed(0)}</strong>
                   </div>
                 </div>
@@ -113,11 +126,16 @@ const MyOrders = () => {
                     <i className={`fa-solid fa-chevron-${isExpanded ? 'up' : 'down'}`} style={{ marginRight: '0.3rem' }} />
                     {isExpanded ? 'Hide' : 'View'} Items
                   </button>
-                  {['served', 'completed'].includes(o.status) && (
+                  {/* Slip only available after payment is completed */}
+                  {paid ? (
                     <button className="btn-primary btn-sm" onClick={() => navigate(`/customer/my-orders/${o.id}/slip`)}>
-                      <i className="fa-solid fa-receipt" style={{ marginRight: '0.3rem' }} />Payment Slip
+                      <i className="fa-solid fa-receipt" style={{ marginRight: '0.3rem' }} />View Payment Slip
                     </button>
-                  )}
+                  ) : o.status === 'completed' ? (
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', alignSelf: 'center' }}>
+                      <i className="fa-solid fa-clock" style={{ marginRight: '0.3rem' }} />Awaiting payment approval
+                    </span>
+                  ) : null}
                 </div>
 
                 {/* Expanded items */}

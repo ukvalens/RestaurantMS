@@ -541,10 +541,20 @@ r.delete('/reservations/:id', authMiddleware, roleCheck('admin'), async (req, re
 });
 
 // ── PAYMENTS ──────────────────────────────────────────────────────────────────
-r.get('/payments', authMiddleware, roleCheck('admin', 'manager'), async (req, res) => {
+r.get('/payments', authMiddleware, async (req, res) => {
   try {
-    const r = await pool.query('SELECT p.*,o.table_id FROM payments p LEFT JOIN orders o ON p.order_id=o.id ORDER BY p.created_at DESC');
-    res.json(r.rows);
+    const { role, id } = req.user;
+    let result;
+    if (role === 'customer' || role === 'waiter') {
+      // Customers/waiters only see payments for their own orders
+      result = await pool.query(
+        `SELECT p.*,o.table_id FROM payments p LEFT JOIN orders o ON p.order_id=o.id WHERE o.waiter_id=$1 ORDER BY p.created_at DESC`,
+        [id]
+      );
+    } else {
+      result = await pool.query('SELECT p.*,o.table_id FROM payments p LEFT JOIN orders o ON p.order_id=o.id ORDER BY p.created_at DESC');
+    }
+    res.json(result.rows);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
