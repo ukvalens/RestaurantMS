@@ -46,23 +46,25 @@ const CustomerDashboard = () => {
         {recent.length === 0 ? (
           <p className="no-results">No reservations yet.</p>
         ) : (
-          <table className="data-table">
-            <thead>
-              <tr><th>ID</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-              {recent.map(r => (
-                <tr key={r.id}>
-                  <td>#{r.id}</td>
-                  <td>Table {r.table_number}</td>
-                  <td>{r.reservation_date?.split('T')[0]}</td>
-                  <td>{r.reservation_time}</td>
-                  <td>{r.party_size}</td>
-                  <td><span className={`badge badge-${r.status}`}>{r.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="data-table">
+              <thead>
+                <tr><th>ID</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                {recent.map(r => (
+                  <tr key={r.id}>
+                    <td>#{r.id}</td>
+                    <td>Table {r.table_number}</td>
+                    <td>{r.reservation_date?.split('T')[0]}</td>
+                    <td>{r.reservation_time}</td>
+                    <td>{r.party_size}</td>
+                    <td><span className={`badge badge-${r.status}`}>{r.status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
