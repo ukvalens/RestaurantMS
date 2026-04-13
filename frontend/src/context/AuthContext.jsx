@@ -22,8 +22,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Fetch immediately on load
     fetchPermissions();
-    // Poll every 30s so permission changes from admin apply without re-login
-    intervalRef.current = setInterval(fetchPermissions, 30000);
+    // Poll every 15s so permission changes from admin apply quickly
+    intervalRef.current = setInterval(fetchPermissions, 15000);
     return () => clearInterval(intervalRef.current);
   }, []);
 
