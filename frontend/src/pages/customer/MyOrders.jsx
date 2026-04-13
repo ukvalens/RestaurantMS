@@ -114,7 +114,7 @@ const MyOrders = () => {
                     {isExpanded ? 'Hide' : 'View'} Items
                   </button>
                   {['served', 'completed'].includes(o.status) && (
-                    <button className="btn-primary btn-sm" onClick={() => navigate(`/app/orders/${o.id}/slip`)}>
+                    <button className="btn-primary btn-sm" onClick={() => navigate(`/customer/my-orders/${o.id}/slip`)}>
                       <i className="fa-solid fa-receipt" style={{ marginRight: '0.3rem' }} />Payment Slip
                     </button>
                   )}

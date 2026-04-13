@@ -73,6 +73,7 @@ function App() {
             <Route path="reserve" element={<CustomerReserve />} />
             <Route path="my-reservations" element={<MyReservations />} />
             <Route path="my-orders" element={<MyOrders />} />
+            <Route path="my-orders/:id/slip" element={<PaymentSlip />} />
             <Route path="my-deliveries" element={<MyDeliveries />} />
             <Route path="announcements" element={<Announcements />} />
             <Route path="profile" element={<CustomerProfile />} />
