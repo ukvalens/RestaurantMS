@@ -648,15 +648,7 @@ r.post('/announcements', authMiddleware, roleCheck('admin', 'manager'), async (r
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-r.delete('/announcements/:id', authMiddleware, roleCheck('admin', 'manager'), async (req, res) => {
-  try {
-    await pool.query('DELETE FROM announcement_replies WHERE announcement_id=$1', [req.params.id]);
-    await pool.query('DELETE FROM announcements WHERE id=$1', [req.params.id]);
-    res.json({ message: 'Deleted' });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// ── ANNOUNCEMENT REPLIES ──────────────────────────────────────────────────────────
+// ── ANNOUNCEMENT REPLIES (must be before DELETE /:id to avoid route conflict) ──
 const ensureRepliesTable = () => pool.query(`
   CREATE TABLE IF NOT EXISTS announcement_replies (
     id SERIAL PRIMARY KEY,
@@ -700,6 +692,14 @@ r.delete('/announcements/:announcementId/replies/:replyId', authMiddleware, asyn
       : 'DELETE FROM announcement_replies WHERE id=$1 AND user_id=$2';
     const params = canDelete ? [req.params.replyId] : [req.params.replyId, req.user.id];
     await pool.query(query, params);
+    res.json({ message: 'Deleted' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+r.delete('/announcements/:id', authMiddleware, roleCheck('admin', 'manager'), async (req, res) => {
+  try {
+    await pool.query('DELETE FROM announcement_replies WHERE announcement_id=$1', [req.params.id]);
+    await pool.query('DELETE FROM announcements WHERE id=$1', [req.params.id]);
     res.json({ message: 'Deleted' });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
