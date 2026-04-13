@@ -21,6 +21,7 @@ const Topbar = ({ onMenuClick }) => {
     <header className="topbar">
       <div className="topbar-left">
         <button className="hamburger-btn" onClick={onMenuClick}>☰</button>
+        <span className="topbar-greeting">{(() => { const h = new Date().getHours(); return h < 12 ? '🌅 Good Morning' : h < 17 ? '☀️ Good Afternoon' : '🌙 Good Evening'; })()}, {user?.username}!</span>
       </div>
       <div className="topbar-right" ref={ref}>
         <NotificationBell />

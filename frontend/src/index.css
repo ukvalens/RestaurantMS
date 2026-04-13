@@ -29,6 +29,7 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--
 /* Topbar */
 .topbar { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 2rem; background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
 .topbar-title { font-size: 1rem; font-weight: 600; color: var(--text-muted); }
+.topbar-greeting { font-size: 0.92rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
 .topbar-right { position: relative; display: flex; align-items: center; gap: 0.5rem; }
 .avatar-btn { display: flex; align-items: center; gap: 0.6rem; background: none; border: 1px solid var(--border); border-radius: 10px; padding: 0.4rem 0.75rem; cursor: pointer; transition: background 0.2s; }
 .avatar-btn:hover { background: var(--bg); }
